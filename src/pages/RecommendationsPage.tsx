@@ -225,21 +225,21 @@ export default function RecommendationsPage() {
               />
               <Area 
                 type="monotone" 
+                dataKey="wind" 
+                stackId="2"
+                stroke="hsl(270, 70%, 60%)" 
+                fill="hsl(270, 70%, 60%)"
+                fillOpacity={0.8}
+                name="Wind"
+              />
+              <Area 
+                type="monotone" 
                 dataKey="solar" 
                 stackId="2"
                 stroke="hsl(var(--accent))" 
                 fill="hsl(var(--accent))"
                 fillOpacity={0.8}
                 name="Solar"
-              />
-              <Area 
-                type="monotone" 
-                dataKey="wind" 
-                stackId="2"
-                stroke="hsl(var(--secondary))" 
-                fill="hsl(var(--secondary))"
-                fillOpacity={0.8}
-                name="Wind"
               />
               <Area 
                 type="monotone" 
