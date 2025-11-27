@@ -14,7 +14,7 @@ export default function CommunityPage() {
   const topRegions = [
     { name: "Luxembourg", investors: 4521, mw: 89.2, co2: 45200 },
     { name: "Ettelbruck", investors: 3214, mw: 68.5, co2: 34800 },
-    { name: "Wallonia", investors: 2890, mw: 52.3, co2: 26500 },
+    { name: "South", investors: 2890, mw: 52.3, co2: 26500 },
     { name: "Flanders", investors: 2222, mw: 35.8, co2: 22000 },
   ];
 
