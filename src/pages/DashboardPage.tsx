@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Sun, Battery, Wind, TrendingUp, Leaf, DollarSign, AlertCircle, Plus } from "lucide-react";
 import { Link } from "react-router-dom";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 
 export default function DashboardPage() {
   const portfolio = {
@@ -67,6 +68,42 @@ export default function DashboardPage() {
     },
   ];
 
+  // Load profile data (24 hours)
+  const loadProfileData = [
+    { hour: "0", solar: 0, wind: 0.6, battery: 0.3, consumption: 0.5 },
+    { hour: "1", solar: 0, wind: 0.5, battery: 0.3, consumption: 0.4 },
+    { hour: "2", solar: 0, wind: 0.7, battery: 0.2, consumption: 0.4 },
+    { hour: "3", solar: 0, wind: 0.8, battery: 0.2, consumption: 0.4 },
+    { hour: "4", solar: 0, wind: 0.6, battery: 0.3, consumption: 0.5 },
+    { hour: "5", solar: 0, wind: 0.5, battery: 0.4, consumption: 0.6 },
+    { hour: "6", solar: 0.1, wind: 0.5, battery: 0.4, consumption: 0.8 },
+    { hour: "7", solar: 0.3, wind: 0.4, battery: 0.5, consumption: 1.0 },
+    { hour: "8", solar: 0.6, wind: 0.4, battery: 0.4, consumption: 1.1 },
+    { hour: "9", solar: 1.0, wind: 0.5, battery: 0.3, consumption: 1.0 },
+    { hour: "10", solar: 1.3, wind: 0.6, battery: 0.2, consumption: 0.9 },
+    { hour: "11", solar: 1.5, wind: 0.5, battery: 0.2, consumption: 0.9 },
+    { hour: "12", solar: 1.6, wind: 0.4, battery: 0.1, consumption: 0.8 },
+    { hour: "13", solar: 1.5, wind: 0.5, battery: 0.2, consumption: 0.9 },
+    { hour: "14", solar: 1.3, wind: 0.6, battery: 0.2, consumption: 0.8 },
+    { hour: "15", solar: 1.0, wind: 0.7, battery: 0.3, consumption: 0.8 },
+    { hour: "16", solar: 0.7, wind: 0.8, battery: 0.4, consumption: 0.9 },
+    { hour: "17", solar: 0.4, wind: 0.9, battery: 0.5, consumption: 1.1 },
+    { hour: "18", solar: 0.2, wind: 1.0, battery: 0.6, consumption: 1.3 },
+    { hour: "19", solar: 0, wind: 0.9, battery: 0.7, consumption: 1.4 },
+    { hour: "20", solar: 0, wind: 0.8, battery: 0.6, consumption: 1.2 },
+    { hour: "21", solar: 0, wind: 0.7, battery: 0.5, consumption: 1.0 },
+    { hour: "22", solar: 0, wind: 0.6, battery: 0.4, consumption: 0.8 },
+    { hour: "23", solar: 0, wind: 0.6, battery: 0.3, consumption: 0.6 },
+    { hour: "24", solar: 0, wind: 0.6, battery: 0.3, consumption: 0.5 },
+  ];
+
+  // Asset ownership breakdown
+  const assetsOwned = [
+    { type: "Solar", icon: Sun, capacity: "2.5 kWc", percentage: 50, amount: 2500, color: "accent" },
+    { type: "Battery", icon: Battery, capacity: "5 kWh", percentage: 30, amount: 1500, color: "secondary" },
+    { type: "Wind", icon: Wind, capacity: "1.5 kW", percentage: 20, amount: 1000, color: "primary" },
+  ];
+
   return (
     <div className="max-w-6xl mx-auto space-y-8 pb-20">
       {/* Header */}
@@ -121,6 +158,126 @@ export default function DashboardPage() {
           <div className="text-sm text-muted-foreground">Energy coverage</div>
         </Card>
       </div>
+
+      {/* Assets Owned Breakdown */}
+      <Card className="p-8 space-y-6">
+        <div>
+          <h2 className="text-2xl font-bold mb-2">Your Energy Assets</h2>
+          <p className="text-muted-foreground">Portfolio breakdown by energy source</p>
+        </div>
+        
+        <div className="grid md:grid-cols-3 gap-6">
+          {assetsOwned.map((asset) => {
+            const Icon = asset.icon;
+            return (
+              <Card key={asset.type} className="p-6 space-y-4 border-2 hover:shadow-lg transition-all">
+                <div className="flex items-center justify-between">
+                  <div className={`w-12 h-12 rounded-xl bg-${asset.color}/10 flex items-center justify-center`}>
+                    <Icon className={`w-6 h-6 text-${asset.color}`} />
+                  </div>
+                  <div className="text-right">
+                    <div className="text-2xl font-bold">{asset.percentage}%</div>
+                    <div className="text-xs text-muted-foreground">of portfolio</div>
+                  </div>
+                </div>
+                
+                <div>
+                  <h3 className="font-semibold mb-1">{asset.type} Energy</h3>
+                  <p className="text-sm text-muted-foreground">{asset.capacity} capacity</p>
+                </div>
+                
+                <div className="pt-4 border-t">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">Investment</span>
+                    <span className="text-xl font-bold text-primary">€{asset.amount.toLocaleString()}</span>
+                  </div>
+                </div>
+
+                {/* Visual percentage bar */}
+                <div className="space-y-2">
+                  <div className="h-2 bg-muted rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full bg-${asset.color} transition-all`}
+                      style={{ width: `${asset.percentage}%` }}
+                    />
+                  </div>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+      </Card>
+
+      {/* Energy Load Profile Chart */}
+      <Card className="p-8 space-y-6">
+        <div>
+          <h2 className="text-2xl font-bold mb-2">Energy Production vs. Consumption</h2>
+          <p className="text-muted-foreground">
+            24-hour overview showing how your assets cover your energy needs
+          </p>
+        </div>
+        
+        <div className="h-[400px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={loadProfileData}>
+              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+              <XAxis 
+                dataKey="hour" 
+                label={{ value: 'Time (hours)', position: 'insideBottom', offset: -5 }}
+                className="text-muted-foreground"
+              />
+              <YAxis 
+                label={{ value: 'kWh', angle: -90, position: 'insideLeft' }}
+                className="text-muted-foreground"
+              />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: 'hsl(var(--card))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '8px'
+                }}
+              />
+              <Legend />
+              <Area 
+                type="monotone" 
+                dataKey="consumption" 
+                stackId="1"
+                stroke="hsl(var(--primary))" 
+                fill="hsl(var(--primary))"
+                fillOpacity={0.8}
+                name="Consumption"
+              />
+              <Area 
+                type="monotone" 
+                dataKey="solar" 
+                stackId="2"
+                stroke="hsl(var(--accent))" 
+                fill="hsl(var(--accent))"
+                fillOpacity={0.8}
+                name="Solar"
+              />
+              <Area 
+                type="monotone" 
+                dataKey="wind" 
+                stackId="2"
+                stroke="hsl(var(--secondary))" 
+                fill="hsl(var(--secondary))"
+                fillOpacity={0.8}
+                name="Wind"
+              />
+              <Area 
+                type="monotone" 
+                dataKey="battery" 
+                stackId="2"
+                stroke="hsl(var(--muted-foreground))" 
+                fill="hsl(var(--muted-foreground))"
+                fillOpacity={0.6}
+                name="Battery"
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      </Card>
 
       {/* AI Recommendations */}
       <Card className="p-6 space-y-4">
@@ -208,17 +365,6 @@ export default function DashboardPage() {
           })}
         </div>
       </div>
-
-      {/* Consumption vs Production Chart Placeholder */}
-      <Card className="p-6 space-y-4">
-        <h2 className="text-xl font-bold">Consumption vs. Production</h2>
-        <div className="h-64 flex items-center justify-center bg-muted/30 rounded-lg border-2 border-dashed">
-          <div className="text-center space-y-2">
-            <TrendingUp className="w-12 h-12 text-muted-foreground mx-auto" />
-            <p className="text-muted-foreground">Chart visualization coming soon</p>
-          </div>
-        </div>
-      </Card>
     </div>
   );
 }
