@@ -41,22 +41,24 @@ export default function DashboardPage() {
   };
 
   // Monthly financial benefits data - calculated based on investment
-  // Savings scale with investment: base €150/month per €5000 invested
-  // Revenue is approximately 40-45% of savings from selling excess production
-  const savingsMultiplier = totalInvestment / 5000;
+  // Total annual benefit capped at 10% of initial investment
+  // Revenue is approximately 38% of total benefit from selling excess production
+  const maxAnnualBenefit = totalInvestment * 0.10;
+  const baseSavingsMultiplier = maxAnnualBenefit / 500; // Base values sum to ~500
+  
   const monthlyData = [
-    { month: "Jan", savings: Math.round(120 * savingsMultiplier), revenue: Math.round(52 * savingsMultiplier) },
-    { month: "Feb", savings: Math.round(128 * savingsMultiplier), revenue: Math.round(55 * savingsMultiplier) },
-    { month: "Mar", savings: Math.round(145 * savingsMultiplier), revenue: Math.round(63 * savingsMultiplier) },
-    { month: "Apr", savings: Math.round(162 * savingsMultiplier), revenue: Math.round(72 * savingsMultiplier) },
-    { month: "May", savings: Math.round(175 * savingsMultiplier), revenue: Math.round(82 * savingsMultiplier) },
-    { month: "Jun", savings: Math.round(185 * savingsMultiplier), revenue: Math.round(88 * savingsMultiplier) },
-    { month: "Jul", savings: Math.round(190 * savingsMultiplier), revenue: Math.round(92 * savingsMultiplier) },
-    { month: "Aug", savings: Math.round(182 * savingsMultiplier), revenue: Math.round(86 * savingsMultiplier) },
-    { month: "Sep", savings: Math.round(165 * savingsMultiplier), revenue: Math.round(75 * savingsMultiplier) },
-    { month: "Oct", savings: Math.round(148 * savingsMultiplier), revenue: Math.round(65 * savingsMultiplier) },
-    { month: "Nov", savings: Math.round(132 * savingsMultiplier), revenue: Math.round(57 * savingsMultiplier) },
-    { month: "Dec", savings: Math.round(122 * savingsMultiplier), revenue: Math.round(50 * savingsMultiplier) }
+    { month: "Jan", savings: Math.round(19 * baseSavingsMultiplier), revenue: Math.round(12 * baseSavingsMultiplier) },
+    { month: "Feb", savings: Math.round(21 * baseSavingsMultiplier), revenue: Math.round(13 * baseSavingsMultiplier) },
+    { month: "Mar", savings: Math.round(24 * baseSavingsMultiplier), revenue: Math.round(15 * baseSavingsMultiplier) },
+    { month: "Apr", savings: Math.round(27 * baseSavingsMultiplier), revenue: Math.round(17 * baseSavingsMultiplier) },
+    { month: "May", savings: Math.round(30 * baseSavingsMultiplier), revenue: Math.round(19 * baseSavingsMultiplier) },
+    { month: "Jun", savings: Math.round(32 * baseSavingsMultiplier), revenue: Math.round(21 * baseSavingsMultiplier) },
+    { month: "Jul", savings: Math.round(33 * baseSavingsMultiplier), revenue: Math.round(22 * baseSavingsMultiplier) },
+    { month: "Aug", savings: Math.round(31 * baseSavingsMultiplier), revenue: Math.round(20 * baseSavingsMultiplier) },
+    { month: "Sep", savings: Math.round(28 * baseSavingsMultiplier), revenue: Math.round(17 * baseSavingsMultiplier) },
+    { month: "Oct", savings: Math.round(25 * baseSavingsMultiplier), revenue: Math.round(15 * baseSavingsMultiplier) },
+    { month: "Nov", savings: Math.round(22 * baseSavingsMultiplier), revenue: Math.round(13 * baseSavingsMultiplier) },
+    { month: "Dec", savings: Math.round(20 * baseSavingsMultiplier), revenue: Math.round(12 * baseSavingsMultiplier) }
   ];
   
   const annualSavings = monthlyData.reduce((sum, m) => sum + m.savings, 0);
