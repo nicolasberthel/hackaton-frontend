@@ -84,6 +84,8 @@ export default function OpportunitiesPage() {
   const location = useLocation();
   const recommendations = location.state?.recommendations;
   const totalInvestment = location.state?.totalInvestment || 5000;
+  const loadProfileData = location.state?.loadProfileData;
+  const profile = location.state?.profile;
   
   const [filter, setFilter] = useState<"all" | "solar" | "battery" | "wind">("all");
   const [selectedProjects, setSelectedProjects] = useState<number[]>([]);
@@ -246,7 +248,7 @@ export default function OpportunitiesPage() {
 
               {/* Action Buttons */}
               <div className="flex gap-3 pt-2">
-                <Link to="/confirmation" state={{ aiSelections, totalInvestment: totalAIInvestment, recommendations }} className="flex-1">
+                <Link to="/confirmation" state={{ aiSelections, totalInvestment: totalAIInvestment, recommendations, loadProfileData, profile }} className="flex-1">
                   <Button className="w-full bg-primary hover:bg-primary-dark">
                     <CheckCircle2 className="w-4 h-4 mr-2" />
                     Proceed with personalized suggestion

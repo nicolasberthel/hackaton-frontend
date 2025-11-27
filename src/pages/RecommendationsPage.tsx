@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Sun, Battery, Wind, ArrowRight, TrendingUp, Leaf, Shield, Sparkles } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { calculatePortfolioAllocation, generateAlternativeScenarios } from "@/lib/investmentCalculations";
+import { getLoadProfileByPod } from "@/data/loadProfiles";
 
 export default function RecommendationsPage() {
   const location = useLocation();
@@ -35,33 +36,8 @@ export default function RecommendationsPage() {
   // Generate alternative scenarios with dynamic metrics
   const scenarios = generateAlternativeScenarios(allocation, totalInvestment);
 
-  // Mock load profile data (24 hours)
-  const loadProfileData = [
-    { hour: "0",  solar: 0.0, wind: 0.5, battery: 0.2, consumption: 0.6 },
-    { hour: "1",  solar: 0.0, wind: 0.5, battery: 0.2, consumption: 0.5 },
-    { hour: "2",  solar: 0.0, wind: 0.5, battery: 0.1, consumption: 0.5 },
-    { hour: "3",  solar: 0.0, wind: 0.5, battery: 0.0, consumption: 0.4 },
-    { hour: "4",  solar: 0.0, wind: 0.5, battery: 0.0, consumption: 0.4 },
-    { hour: "5",  solar: 0.0, wind: 0.5, battery: 0.0, consumption: 0.5 },
-    { hour: "6",  solar: 0.1, wind: 0.5, battery: 0.0, consumption: 0.8 },
-    { hour: "7",  solar: 0.3, wind: 0.4, battery: 0.0, consumption: 0.9 },
-    { hour: "8",  solar: 0.6, wind: 0.4, battery: 0.0, consumption: 0.9 },
-    { hour: "9",  solar: 0.9, wind: 0.4, battery: 0.0, consumption: 0.8 },
-    { hour: "10", solar: 1.2, wind: 0.4, battery: 0.0, consumption: 0.8 },
-    { hour: "11", solar: 1.4, wind: 0.4, battery: 0.0, consumption: 0.8 },
-    { hour: "12", solar: 1.5, wind: 0.4, battery: 0.0, consumption: 0.8 },
-    { hour: "13", solar: 1.4, wind: 0.4, battery: 0.0, consumption: 0.8 },
-    { hour: "14", solar: 1.2, wind: 0.4, battery: 0.0, consumption: 0.8 },
-    { hour: "15", solar: 1.0, wind: 0.5, battery: 0.0, consumption: 0.9 },
-    { hour: "16", solar: 0.7, wind: 0.5, battery: 0.1, consumption: 1.0 },
-    { hour: "17", solar: 0.4, wind: 0.6, battery: 0.3, consumption: 1.3 },
-    { hour: "18", solar: 0.2, wind: 0.6, battery: 0.4, consumption: 1.5 },
-    { hour: "19", solar: 0.0, wind: 0.6, battery: 0.5, consumption: 1.4 },
-    { hour: "20", solar: 0.0, wind: 0.6, battery: 0.4, consumption: 1.2 },
-    { hour: "21", solar: 0.0, wind: 0.6, battery: 0.3, consumption: 1.0 },
-    { hour: "22", solar: 0.0, wind: 0.6, battery: 0.2, consumption: 0.9 },
-    { hour: "23", solar: 0.0, wind: 0.5, battery: 0.2, consumption: 0.7 },
-  ];
+  // Get load profile based on POD number
+  const loadProfileData = getLoadProfileByPod(profile.podNumber || "");
 
   return (
     <div className="max-w-6xl mx-auto space-y-8 pb-20">
@@ -318,7 +294,7 @@ export default function RecommendationsPage() {
         <Link to="/profile">
           <Button variant="outline">Modify Profile</Button>
         </Link>
-        <Link to="/opportunities" state={{ recommendations, totalInvestment, profile }}>
+        <Link to="/opportunities" state={{ recommendations, totalInvestment, profile, loadProfileData }}>
           <Button className="bg-primary hover:bg-primary-dark">
             View Available Projects
             <ArrowRight className="ml-2 w-4 h-4" />

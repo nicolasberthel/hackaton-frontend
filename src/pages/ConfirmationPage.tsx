@@ -20,6 +20,8 @@ export default function ConfirmationPage() {
   const aiSelections = location.state?.aiSelections || [];
   const totalInvestment = location.state?.totalInvestment || 0;
   const recommendations = location.state?.recommendations;
+  const loadProfileData = location.state?.loadProfileData;
+  const profile = location.state?.profile;
 
   const [paymentMethod, setPaymentMethod] = useState<"one-off" | "monthly">("one-off");
   const [monthlyAmount, setMonthlyAmount] = useState(200);
@@ -315,7 +317,9 @@ export default function ConfirmationPage() {
               totalInvestment, 
               recommendations,
               paymentMethod,
-              monthlyAmount: paymentMethod === "monthly" ? monthlyAmount : null
+              monthlyAmount: paymentMethod === "monthly" ? monthlyAmount : null,
+              loadProfileData,
+              profile
             } 
           }} 
           className="flex-1"

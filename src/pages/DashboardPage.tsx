@@ -5,6 +5,7 @@ import { Sun, Battery, Wind, TrendingUp, Leaf, DollarSign, AlertCircle, Plus } f
 import { Link, useLocation } from "react-router-dom";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { useEffect, useState } from "react";
+import { getLoadProfileByPod } from "@/data/loadProfiles";
 
 export default function DashboardPage() {
   const location = useLocation();
@@ -39,6 +40,10 @@ export default function DashboardPage() {
     co2Saved: (totalInvestment / 1000) * 0.9, // Approximate CO2 calculation
     autonomy: 65,
   };
+
+  // Get load profile data - use from portfolio or regenerate from POD
+  const loadProfileData = portfolioData?.loadProfileData || 
+    getLoadProfileByPod(portfolioData?.profile?.podNumber || "");
 
   const investments = [
     {
@@ -94,33 +99,6 @@ export default function DashboardPage() {
     },
   ];
 
-  // Load profile data (24 hours)
-  const loadProfileData = [
-    { hour: "0",  solar: 0.0, wind: 0.5, battery: 0.2, consumption: 0.6 },
-    { hour: "1",  solar: 0.0, wind: 0.5, battery: 0.2, consumption: 0.5 },
-    { hour: "2",  solar: 0.0, wind: 0.5, battery: 0.1, consumption: 0.5 },
-    { hour: "3",  solar: 0.0, wind: 0.5, battery: 0.0, consumption: 0.4 },
-    { hour: "4",  solar: 0.0, wind: 0.5, battery: 0.0, consumption: 0.4 },
-    { hour: "5",  solar: 0.0, wind: 0.5, battery: 0.0, consumption: 0.5 },
-    { hour: "6",  solar: 0.1, wind: 0.5, battery: 0.0, consumption: 0.8 },
-    { hour: "7",  solar: 0.3, wind: 0.4, battery: 0.0, consumption: 0.9 },
-    { hour: "8",  solar: 0.6, wind: 0.4, battery: 0.0, consumption: 0.9 },
-    { hour: "9",  solar: 0.9, wind: 0.4, battery: 0.0, consumption: 0.8 },
-    { hour: "10", solar: 1.2, wind: 0.4, battery: 0.0, consumption: 0.8 },
-    { hour: "11", solar: 1.4, wind: 0.4, battery: 0.0, consumption: 0.8 },
-    { hour: "12", solar: 1.5, wind: 0.4, battery: 0.0, consumption: 0.8 },
-    { hour: "13", solar: 1.4, wind: 0.4, battery: 0.0, consumption: 0.8 },
-    { hour: "14", solar: 1.2, wind: 0.4, battery: 0.0, consumption: 0.8 },
-    { hour: "15", solar: 1.0, wind: 0.5, battery: 0.0, consumption: 0.9 },
-    { hour: "16", solar: 0.7, wind: 0.5, battery: 0.1, consumption: 1.0 },
-    { hour: "17", solar: 0.4, wind: 0.6, battery: 0.3, consumption: 1.3 },
-    { hour: "18", solar: 0.2, wind: 0.6, battery: 0.4, consumption: 1.5 },
-    { hour: "19", solar: 0.0, wind: 0.6, battery: 0.5, consumption: 1.4 },
-    { hour: "20", solar: 0.0, wind: 0.6, battery: 0.4, consumption: 1.2 },
-    { hour: "21", solar: 0.0, wind: 0.6, battery: 0.3, consumption: 1.0 },
-    { hour: "22", solar: 0.0, wind: 0.6, battery: 0.2, consumption: 0.9 },
-    { hour: "23", solar: 0.0, wind: 0.5, battery: 0.2, consumption: 0.7 },
-  ];
 
   // Asset ownership breakdown - uses actual investment percentages
   const assetsOwned = [
