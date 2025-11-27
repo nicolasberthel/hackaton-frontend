@@ -244,9 +244,9 @@ export default function RecommendationsPage() {
                 type="monotone" 
                 dataKey="battery" 
                 stackId="2"
-                stroke="hsl(var(--muted))" 
-                fill="hsl(var(--muted))"
-                fillOpacity={0.8}
+                stroke="hsl(var(--muted-foreground))" 
+                fill="hsl(var(--muted-foreground))"
+                fillOpacity={0.7}
                 name="Battery"
               />
             </AreaChart>

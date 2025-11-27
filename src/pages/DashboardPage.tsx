@@ -308,7 +308,7 @@ export default function DashboardPage() {
                 stackId="2"
                 stroke="hsl(var(--muted-foreground))" 
                 fill="hsl(var(--muted-foreground))"
-                fillOpacity={0.6}
+                fillOpacity={0.7}
                 name="Battery"
               />
             </AreaChart>
