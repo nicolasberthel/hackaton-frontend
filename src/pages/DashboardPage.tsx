@@ -159,74 +159,54 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      {/* Assets Owned Breakdown */}
-      <Card className="p-8 space-y-6">
-        <div>
-          <h2 className="text-2xl font-bold mb-2">Your Energy Assets</h2>
-          <p className="text-muted-foreground">Portfolio breakdown by energy source</p>
-        </div>
-        
-        <div className="grid md:grid-cols-3 gap-6">
-          {assetsOwned.map((asset) => {
-            const Icon = asset.icon;
+      {/* Active Investments */}
+      <div className="space-y-4">
+        <h2 className="text-2xl font-bold">Your Investments</h2>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {investments.map((investment) => {
+            const Icon = investment.icon;
+            const gain = investment.currentValue - investment.invested;
+            const gainPercentage = ((gain / investment.invested) * 100).toFixed(1);
+
             return (
-              <Card key={asset.type} className="p-6 space-y-4 border-2 hover:shadow-lg transition-all">
-                <div className="flex items-center justify-between">
-                  <div className={`w-12 h-12 rounded-xl bg-${asset.color}/10 flex items-center justify-center`}>
-                    <Icon className={`w-6 h-6 text-${asset.color}`} />
+              <Card key={investment.id} className="p-6 space-y-4 hover:shadow-lg transition-all">
+                <div className="flex items-start justify-between">
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <Icon className="w-6 h-6 text-primary" />
                   </div>
-                  <div className="text-right">
-                    <div className="text-2xl font-bold">{asset.percentage}%</div>
-                    <div className="text-xs text-muted-foreground">of portfolio</div>
-                  </div>
+                  <Badge className="bg-success">Active</Badge>
                 </div>
-                
+
                 <div>
-                  <h3 className="font-semibold mb-1">{asset.type} Energy</h3>
-                  <p className="text-sm text-muted-foreground">{asset.capacity} capacity</p>
+                  <h3 className="font-semibold mb-1">{investment.name}</h3>
+                  <p className="text-sm text-muted-foreground">{investment.capacity}</p>
                 </div>
-                
-                <div className="pt-4 border-t space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Your Investment</span>
-                    <span className="text-lg font-bold text-primary">€{asset.amount.toLocaleString()}</span>
+
+                <div className="space-y-2 pt-2 border-t">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Invested</span>
+                    <span className="font-medium">€{investment.invested}</span>
                   </div>
-                  
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Current Price per Share</span>
-                    <div className="text-right">
-                      <div className="text-lg font-semibold">€{asset.currentPrice}</div>
-                      <div className={`text-xs ${asset.priceChange >= 0 ? 'text-success' : 'text-destructive'}`}>
-                        {asset.priceChange >= 0 ? '+' : ''}{asset.priceChange}%
-                      </div>
-                    </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Current Value</span>
+                    <span className="font-bold text-primary">€{investment.currentValue}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Gain</span>
+                    <span className="font-bold text-success">
+                      +€{gain} ({gainPercentage}%)
+                    </span>
                   </div>
                 </div>
 
-                {/* Visual percentage bar */}
-                <div className="space-y-2">
-                  <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <div 
-                      className={`h-full bg-${asset.color} transition-all`}
-                      style={{ width: `${asset.percentage}%` }}
-                    />
-                  </div>
-                </div>
-
-                {/* Buy/Sell Buttons */}
-                <div className="grid grid-cols-2 gap-2 pt-2">
-                  <Button variant="outline" size="sm" className="w-full">
-                    Buy More
-                  </Button>
-                  <Button variant="outline" size="sm" className="w-full border-destructive text-destructive hover:bg-destructive hover:text-white">
-                    Sell
-                  </Button>
-                </div>
+                <Button variant="outline" size="sm" className="w-full">
+                  View Details
+                </Button>
               </Card>
             );
           })}
         </div>
-      </Card>
+      </div>
 
       {/* Energy Load Profile Chart */}
       <Card className="p-8 space-y-6">
@@ -337,54 +317,6 @@ export default function DashboardPage() {
         </div>
       </Card>
 
-      {/* Active Investments */}
-      <div className="space-y-4">
-        <h2 className="text-2xl font-bold">Your Investments</h2>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {investments.map((investment) => {
-            const Icon = investment.icon;
-            const gain = investment.currentValue - investment.invested;
-            const gainPercentage = ((gain / investment.invested) * 100).toFixed(1);
-
-            return (
-              <Card key={investment.id} className="p-6 space-y-4 hover:shadow-lg transition-all">
-                <div className="flex items-start justify-between">
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <Icon className="w-6 h-6 text-primary" />
-                  </div>
-                  <Badge className="bg-success">Active</Badge>
-                </div>
-
-                <div>
-                  <h3 className="font-semibold mb-1">{investment.name}</h3>
-                  <p className="text-sm text-muted-foreground">{investment.capacity}</p>
-                </div>
-
-                <div className="space-y-2 pt-2 border-t">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Invested</span>
-                    <span className="font-medium">€{investment.invested}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Current Value</span>
-                    <span className="font-bold text-primary">€{investment.currentValue}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Gain</span>
-                    <span className="font-bold text-success">
-                      +€{gain} ({gainPercentage}%)
-                    </span>
-                  </div>
-                </div>
-
-                <Button variant="outline" size="sm" className="w-full">
-                  View Details
-                </Button>
-              </Card>
-            );
-          })}
-        </div>
-      </div>
     </div>
   );
 }
