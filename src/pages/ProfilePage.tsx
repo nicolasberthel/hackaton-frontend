@@ -8,9 +8,12 @@ import { Slider } from "@/components/ui/slider";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowRight, Home, TrendingUp, Leaf, Shield, Info, FileText, Zap } from "lucide-react";
+import { LoadingScreen } from "@/components/LoadingScreen";
+
 export default function ProfilePage() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
   const [dataMode, setDataMode] = useState<"pod" | "manual">("pod");
   const [profile, setProfile] = useState({
     podNumber: "",
@@ -21,24 +24,37 @@ export default function ProfilePage() {
     riskAppetite: "moderate",
     objectives: [] as string[]
   });
+
   const totalSteps = 4;
+
   const handleContinue = () => {
     if (step < totalSteps) {
       setStep(step + 1);
     } else {
-      navigate("/recommendations", {
-        state: {
-          profile
-        }
-      });
+      // Show loading screen before navigating to recommendations
+      setIsLoading(true);
     }
   };
+
+  const handleLoadingComplete = () => {
+    navigate("/recommendations", {
+      state: {
+        profile
+      }
+    });
+  };
+
+  // Show loading screen overlay
+  if (isLoading) {
+    return <LoadingScreen onComplete={handleLoadingComplete} />;
+  }
   const toggleObjective = (objective: string) => {
     setProfile(prev => ({
       ...prev,
       objectives: prev.objectives.includes(objective) ? prev.objectives.filter(o => o !== objective) : [...prev.objectives, objective]
     }));
   };
+
   return <div className="max-w-3xl mx-auto space-y-8 pb-20">
       {/* Progress Bar */}
       <div className="space-y-2">
