@@ -90,13 +90,47 @@ export default function OpportunitiesPage() {
   const [mode, setMode] = useState<"ai" | "manual">("ai");
 
   // AI pre-selects projects based on recommendations
-  const aiSelections = recommendations ? [
-    { projectId: 1, amount: Math.round(recommendations.solar.investment / 1250) * 1250 }, // Solar
-    { projectId: 4, amount: Math.round((recommendations.solar.investment - Math.round(recommendations.solar.investment / 1250) * 1250)) }, // More solar if budget allows
-    { projectId: 2, amount: Math.round(recommendations.battery.investment / 750) * 750 }, // Battery
-    { projectId: 5, amount: Math.round((recommendations.battery.investment - Math.round(recommendations.battery.investment / 750) * 750)) }, // More battery if needed
-    { projectId: 3, amount: Math.round(recommendations.wind.investment / 850) * 850 }, // Wind
-  ].filter(s => s.amount > 0) : [];
+  const aiSelections = recommendations ? (() => {
+    const selections: { projectId: number; amount: number }[] = [];
+    
+    // Allocate solar budget
+    let remainingSolar = recommendations.solar.investment;
+    const solarUnits1 = Math.floor(remainingSolar / 1250);
+    if (solarUnits1 > 0) {
+      selections.push({ projectId: 1, amount: solarUnits1 * 1250 });
+      remainingSolar -= solarUnits1 * 1250;
+    }
+    if (remainingSolar >= 1500) {
+      selections.push({ projectId: 4, amount: 1500 });
+      remainingSolar -= 1500;
+    }
+    
+    // Allocate battery budget
+    let remainingBattery = recommendations.battery.investment;
+    const batteryUnits2 = Math.floor(remainingBattery / 750);
+    if (batteryUnits2 > 0) {
+      selections.push({ projectId: 2, amount: batteryUnits2 * 750 });
+      remainingBattery -= batteryUnits2 * 750;
+    }
+    if (remainingBattery >= 1200) {
+      selections.push({ projectId: 5, amount: 1200 });
+      remainingBattery -= 1200;
+    }
+    
+    // Allocate wind budget
+    let remainingWind = recommendations.wind.investment;
+    const windUnits3 = Math.floor(remainingWind / 850);
+    if (windUnits3 > 0) {
+      selections.push({ projectId: 3, amount: windUnits3 * 850 });
+      remainingWind -= windUnits3 * 850;
+    }
+    if (remainingWind >= 1100) {
+      selections.push({ projectId: 6, amount: 1100 });
+      remainingWind -= 1100;
+    }
+    
+    return selections;
+  })() : [];
 
   const getAISelectedAmount = (projectId: number) => {
     return aiSelections.find(s => s.projectId === projectId)?.amount || 0;
@@ -153,37 +187,75 @@ export default function OpportunitiesPage() {
             </div>
             <div className="flex-1 space-y-4">
               <div>
-                <h3 className="font-semibold text-lg mb-1">AI-Selected Portfolio Ready</h3>
-                <p className="text-sm text-muted-foreground">
-                  Based on your recommended portfolio, I've pre-selected the optimal projects to match your {recommendations.solar.percentage}% solar, {recommendations.battery.percentage}% battery, and {recommendations.wind.percentage}% wind allocation.
-                </p>
+                <h3 className="font-semibold text-lg mb-1">Your personal portfolio</h3>
               </div>
 
               {/* Selected Projects Overview */}
               <div className="grid md:grid-cols-3 gap-4">
+                {/* Solar Projects */}
                 <div className="p-4 rounded-lg bg-card border">
-                  <div className="flex items-center gap-2 mb-2">
+                  <div className="flex items-center gap-2 mb-3">
                     <Sun className="w-5 h-5 text-accent" />
                     <span className="font-semibold">Solar Projects</span>
                   </div>
-                  <div className="text-2xl font-bold text-primary">€{recommendations.solar.investment.toLocaleString()}</div>
-                  <div className="text-sm text-muted-foreground">{recommendations.solar.percentage}% of portfolio</div>
+                  <div className="text-2xl font-bold text-primary mb-3">€{recommendations.solar.investment.toLocaleString()}</div>
+                  <div className="space-y-2 text-sm">
+                    {aiSelections
+                      .filter(s => projects.find(p => p.id === s.projectId)?.type === 'solar')
+                      .map(selection => {
+                        const project = projects.find(p => p.id === selection.projectId);
+                        return (
+                          <div key={selection.projectId} className="flex justify-between items-center">
+                            <span className="text-muted-foreground">{project?.name}</span>
+                            <span className="font-medium">€{selection.amount.toLocaleString()}</span>
+                          </div>
+                        );
+                      })}
+                  </div>
                 </div>
+
+                {/* Battery Storage */}
                 <div className="p-4 rounded-lg bg-card border">
-                  <div className="flex items-center gap-2 mb-2">
+                  <div className="flex items-center gap-2 mb-3">
                     <Battery className="w-5 h-5 text-secondary" />
                     <span className="font-semibold">Battery Storage</span>
                   </div>
-                  <div className="text-2xl font-bold text-primary">€{recommendations.battery.investment.toLocaleString()}</div>
-                  <div className="text-sm text-muted-foreground">{recommendations.battery.percentage}% of portfolio</div>
+                  <div className="text-2xl font-bold text-primary mb-3">€{recommendations.battery.investment.toLocaleString()}</div>
+                  <div className="space-y-2 text-sm">
+                    {aiSelections
+                      .filter(s => projects.find(p => p.id === s.projectId)?.type === 'battery')
+                      .map(selection => {
+                        const project = projects.find(p => p.id === selection.projectId);
+                        return (
+                          <div key={selection.projectId} className="flex justify-between items-center">
+                            <span className="text-muted-foreground">{project?.name}</span>
+                            <span className="font-medium">€{selection.amount.toLocaleString()}</span>
+                          </div>
+                        );
+                      })}
+                  </div>
                 </div>
+
+                {/* Wind Energy */}
                 <div className="p-4 rounded-lg bg-card border">
-                  <div className="flex items-center gap-2 mb-2">
+                  <div className="flex items-center gap-2 mb-3">
                     <Wind className="w-5 h-5 text-primary" />
                     <span className="font-semibold">Wind Energy</span>
                   </div>
-                  <div className="text-2xl font-bold text-primary">€{recommendations.wind.investment.toLocaleString()}</div>
-                  <div className="text-sm text-muted-foreground">{recommendations.wind.percentage}% of portfolio</div>
+                  <div className="text-2xl font-bold text-primary mb-3">€{recommendations.wind.investment.toLocaleString()}</div>
+                  <div className="space-y-2 text-sm">
+                    {aiSelections
+                      .filter(s => projects.find(p => p.id === s.projectId)?.type === 'wind')
+                      .map(selection => {
+                        const project = projects.find(p => p.id === selection.projectId);
+                        return (
+                          <div key={selection.projectId} className="flex justify-between items-center">
+                            <span className="text-muted-foreground">{project?.name}</span>
+                            <span className="font-medium">€{selection.amount.toLocaleString()}</span>
+                          </div>
+                        );
+                      })}
+                  </div>
                 </div>
               </div>
 
