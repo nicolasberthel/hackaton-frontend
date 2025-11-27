@@ -1,13 +1,18 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Sun, Battery, Wind, ArrowRight, TrendingUp, Leaf, Shield } from "lucide-react";
 
 export default function RecommendationsPage() {
+  const location = useLocation();
+  const profile = location.state?.profile || { budget: 5000, objectives: [], riskAppetite: "moderate" };
+  
+  const totalInvestment = profile.budget;
+  
   const recommendations = {
-    solar: { capacity: 4.5, percentage: 50, investment: 2500 },
-    battery: { capacity: 8, percentage: 30, investment: 1500 },
-    wind: { capacity: 2, percentage: 20, investment: 1000 },
+    solar: { capacity: (totalInvestment / 1111).toFixed(1), percentage: 50, investment: Math.round(totalInvestment * 0.5) },
+    battery: { capacity: (totalInvestment / 625).toFixed(0), percentage: 30, investment: Math.round(totalInvestment * 0.3) },
+    wind: { capacity: (totalInvestment / 2500).toFixed(1), percentage: 20, investment: Math.round(totalInvestment * 0.2) },
   };
 
   const scenarios = [
@@ -35,7 +40,7 @@ export default function RecommendationsPage() {
             <p className="text-muted-foreground">Optimal mix for your goals and budget</p>
           </div>
           <div className="text-right">
-            <div className="text-3xl font-bold text-primary">€5,000</div>
+            <div className="text-3xl font-bold text-primary">€{totalInvestment.toLocaleString()}</div>
             <p className="text-sm text-muted-foreground">Total Investment</p>
           </div>
         </div>
