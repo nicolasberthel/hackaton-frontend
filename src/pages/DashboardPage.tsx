@@ -279,9 +279,10 @@ export default function DashboardPage() {
                 type="monotone" 
                 dataKey="consumption" 
                 stackId="1"
-                stroke="hsl(var(--primary))" 
-                fill="hsl(var(--primary))"
-                fillOpacity={0.8}
+                stroke="hsl(0, 84%, 60%)" 
+                strokeWidth={3}
+                strokeDasharray="5 5"
+                fill="none"
                 name="Consumption"
               />
               <Area 
