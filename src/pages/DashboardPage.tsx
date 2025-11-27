@@ -99,9 +99,9 @@ export default function DashboardPage() {
 
   // Asset ownership breakdown
   const assetsOwned = [
-    { type: "Solar", icon: Sun, capacity: "2.5 kWc", percentage: 50, amount: 2500, color: "accent" },
-    { type: "Battery", icon: Battery, capacity: "5 kWh", percentage: 30, amount: 1500, color: "secondary" },
-    { type: "Wind", icon: Wind, capacity: "1.5 kW", percentage: 20, amount: 1000, color: "primary" },
+    { type: "Solar", icon: Sun, capacity: "2.5 kWc", percentage: 50, amount: 2500, color: "accent", currentPrice: 520, priceChange: 4.2 },
+    { type: "Battery", icon: Battery, capacity: "5 kWh", percentage: 30, amount: 1500, color: "secondary", currentPrice: 162, priceChange: -1.8 },
+    { type: "Wind", icon: Wind, capacity: "1.5 kW", percentage: 20, amount: 1000, color: "primary", currentPrice: 680, priceChange: 2.5 },
   ];
 
   return (
@@ -186,10 +186,20 @@ export default function DashboardPage() {
                   <p className="text-sm text-muted-foreground">{asset.capacity} capacity</p>
                 </div>
                 
-                <div className="pt-4 border-t">
+                <div className="pt-4 border-t space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Investment</span>
-                    <span className="text-xl font-bold text-primary">€{asset.amount.toLocaleString()}</span>
+                    <span className="text-sm text-muted-foreground">Your Investment</span>
+                    <span className="text-lg font-bold text-primary">€{asset.amount.toLocaleString()}</span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">Current Price per Share</span>
+                    <div className="text-right">
+                      <div className="text-lg font-semibold">€{asset.currentPrice}</div>
+                      <div className={`text-xs ${asset.priceChange >= 0 ? 'text-success' : 'text-destructive'}`}>
+                        {asset.priceChange >= 0 ? '+' : ''}{asset.priceChange}%
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -201,6 +211,16 @@ export default function DashboardPage() {
                       style={{ width: `${asset.percentage}%` }}
                     />
                   </div>
+                </div>
+
+                {/* Buy/Sell Buttons */}
+                <div className="grid grid-cols-2 gap-2 pt-2">
+                  <Button variant="outline" size="sm" className="w-full">
+                    Buy More
+                  </Button>
+                  <Button variant="outline" size="sm" className="w-full border-destructive text-destructive hover:bg-destructive hover:text-white">
+                    Sell
+                  </Button>
                 </div>
               </Card>
             );
