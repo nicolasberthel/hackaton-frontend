@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Sun, Battery, Wind, ArrowRight, TrendingUp, Leaf, Shield } from "lucide-react";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 
 export default function RecommendationsPage() {
   const location = useLocation();
@@ -20,6 +21,35 @@ export default function RecommendationsPage() {
     { name: "Max Return", solar: 60, battery: 20, wind: 20, return: 7.8, autonomy: 60, co2: 2.5 },
     { name: "Max Autonomy", solar: 45, battery: 40, wind: 15, return: 5.2, autonomy: 78, co2: 3.1 },
     { name: "Most Sustainable", solar: 40, battery: 30, wind: 30, return: 6.0, autonomy: 62, co2: 3.5 },
+  ];
+
+  // Mock load profile data (24 hours)
+  const loadProfileData = [
+    { hour: "0", solar: 0, wind: 0.6, battery: 0.3, consumption: 0.5 },
+    { hour: "1", solar: 0, wind: 0.5, battery: 0.3, consumption: 0.4 },
+    { hour: "2", solar: 0, wind: 0.7, battery: 0.2, consumption: 0.4 },
+    { hour: "3", solar: 0, wind: 0.8, battery: 0.2, consumption: 0.4 },
+    { hour: "4", solar: 0, wind: 0.6, battery: 0.3, consumption: 0.5 },
+    { hour: "5", solar: 0, wind: 0.5, battery: 0.4, consumption: 0.6 },
+    { hour: "6", solar: 0.1, wind: 0.5, battery: 0.4, consumption: 0.8 },
+    { hour: "7", solar: 0.3, wind: 0.4, battery: 0.5, consumption: 1.0 },
+    { hour: "8", solar: 0.6, wind: 0.4, battery: 0.4, consumption: 1.1 },
+    { hour: "9", solar: 1.0, wind: 0.5, battery: 0.3, consumption: 1.0 },
+    { hour: "10", solar: 1.3, wind: 0.6, battery: 0.2, consumption: 0.9 },
+    { hour: "11", solar: 1.5, wind: 0.5, battery: 0.2, consumption: 0.9 },
+    { hour: "12", solar: 1.6, wind: 0.4, battery: 0.1, consumption: 0.8 },
+    { hour: "13", solar: 1.5, wind: 0.5, battery: 0.2, consumption: 0.9 },
+    { hour: "14", solar: 1.3, wind: 0.6, battery: 0.2, consumption: 0.8 },
+    { hour: "15", solar: 1.0, wind: 0.7, battery: 0.3, consumption: 0.8 },
+    { hour: "16", solar: 0.7, wind: 0.8, battery: 0.4, consumption: 0.9 },
+    { hour: "17", solar: 0.4, wind: 0.9, battery: 0.5, consumption: 1.1 },
+    { hour: "18", solar: 0.2, wind: 1.0, battery: 0.6, consumption: 1.3 },
+    { hour: "19", solar: 0, wind: 0.9, battery: 0.7, consumption: 1.4 },
+    { hour: "20", solar: 0, wind: 0.8, battery: 0.6, consumption: 1.2 },
+    { hour: "21", solar: 0, wind: 0.7, battery: 0.5, consumption: 1.0 },
+    { hour: "22", solar: 0, wind: 0.6, battery: 0.4, consumption: 0.8 },
+    { hour: "23", solar: 0, wind: 0.6, battery: 0.3, consumption: 0.6 },
+    { hour: "24", solar: 0, wind: 0.6, battery: 0.3, consumption: 0.5 },
   ];
 
   return (
@@ -113,6 +143,77 @@ export default function RecommendationsPage() {
               <div className="text-sm text-muted-foreground">CO₂ Saved/Year</div>
             </div>
           </div>
+        </div>
+      </Card>
+
+      {/* Load Profile Chart */}
+      <Card className="p-8 space-y-6">
+        <div>
+          <h2 className="text-2xl font-bold mb-2">Your Energy Load Profile</h2>
+          <p className="text-muted-foreground">
+            24-hour overview comparing your investment's production with actual consumption
+          </p>
+        </div>
+        
+        <div className="h-[400px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={loadProfileData}>
+              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+              <XAxis 
+                dataKey="hour" 
+                label={{ value: 'Time (hours)', position: 'insideBottom', offset: -5 }}
+                className="text-muted-foreground"
+              />
+              <YAxis 
+                label={{ value: 'kWh', angle: -90, position: 'insideLeft' }}
+                className="text-muted-foreground"
+              />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: 'hsl(var(--card))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '8px'
+                }}
+              />
+              <Legend />
+              <Area 
+                type="monotone" 
+                dataKey="consumption" 
+                stackId="1"
+                stroke="hsl(var(--primary))" 
+                fill="hsl(var(--primary))"
+                fillOpacity={0.8}
+                name="Consumption"
+              />
+              <Area 
+                type="monotone" 
+                dataKey="solar" 
+                stackId="2"
+                stroke="hsl(var(--accent))" 
+                fill="hsl(var(--accent))"
+                fillOpacity={0.8}
+                name="Solar"
+              />
+              <Area 
+                type="monotone" 
+                dataKey="wind" 
+                stackId="2"
+                stroke="hsl(var(--secondary))" 
+                fill="hsl(var(--secondary))"
+                fillOpacity={0.8}
+                name="Wind"
+              />
+              <Area 
+                type="monotone" 
+                dataKey="battery" 
+                stackId="2"
+                stroke="hsl(var(--muted))" 
+                fill="hsl(var(--muted))"
+                fillOpacity={0.8}
+                name="Battery"
+              />
+            </AreaChart>
+          </ResponsiveContainer>
         </div>
       </Card>
 
