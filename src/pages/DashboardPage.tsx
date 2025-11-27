@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Sun, Battery, Wind, TrendingUp, Leaf, DollarSign, AlertCircle, Plus } from "lucide-react";
 import { Link } from "react-router-dom";
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { AreaChart, Area, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 
 export default function DashboardPage() {
   const portfolio = {
@@ -275,19 +275,19 @@ export default function DashboardPage() {
                 }}
               />
               <Legend />
-              <Area 
+              <Line 
                 type="monotone" 
-                dataKey="consumption" 
-                stackId="1"
-                stroke="hsl(var(--primary))" 
-                fill="hsl(var(--primary))"
-                fillOpacity={0.8}
+                dataKey="consumption"
+                stroke="hsl(0 84% 60%)" 
+                strokeWidth={2}
+                strokeDasharray="5 5"
+                dot={false}
                 name="Consumption"
               />
               <Area 
                 type="monotone" 
                 dataKey="solar" 
-                stackId="2"
+                stackId="1"
                 stroke="hsl(var(--accent))" 
                 fill="hsl(var(--accent))"
                 fillOpacity={0.8}
@@ -296,7 +296,7 @@ export default function DashboardPage() {
               <Area 
                 type="monotone" 
                 dataKey="wind" 
-                stackId="2"
+                stackId="1"
                 stroke="hsl(var(--secondary))" 
                 fill="hsl(var(--secondary))"
                 fillOpacity={0.8}
@@ -305,7 +305,7 @@ export default function DashboardPage() {
               <Area 
                 type="monotone" 
                 dataKey="battery" 
-                stackId="2"
+                stackId="1"
                 stroke="hsl(var(--muted-foreground))" 
                 fill="hsl(var(--muted-foreground))"
                 fillOpacity={0.7}
