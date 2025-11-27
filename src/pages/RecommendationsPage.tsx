@@ -17,7 +17,7 @@ export default function RecommendationsPage() {
   };
 
   const scenarios = [
-    { name: "Current Recommendation", solar: 50, battery: 30, wind: 20, return: 6.5, autonomy: 65, co2: 2.8 },
+    { name: "Current Recommendation", solar: recommendations.solar.percentage, battery: recommendations.battery.percentage, wind: recommendations.wind.percentage, return: 6.5, autonomy: 65, co2: 2.8 },
     { name: "Max Return", solar: 60, battery: 20, wind: 20, return: 7.8, autonomy: 60, co2: 2.5 },
     { name: "Max Autonomy", solar: 45, battery: 40, wind: 15, return: 5.2, autonomy: 78, co2: 3.1 },
     { name: "Most Sustainable", solar: 40, battery: 30, wind: 30, return: 6.0, autonomy: 62, co2: 3.5 },
