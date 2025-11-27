@@ -27,7 +27,7 @@ export default function ProfilePage() {
     if (step < totalSteps) {
       setStep(step + 1);
     } else {
-      navigate("/recommendations");
+      navigate("/recommendations", { state: { profile } });
     }
   };
 
