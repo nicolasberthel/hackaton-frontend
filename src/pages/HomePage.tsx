@@ -1,123 +1,174 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Zap, TrendingUp, Shield, Leaf } from "lucide-react";
+import { TrendingUp, Shield, Leaf, LayoutDashboard, ArrowRight, Zap, Users, Award } from "lucide-react";
 
 export default function HomePage() {
   return (
     <div className="space-y-16 pb-20">
       {/* Hero Section */}
-      <section className="text-center space-y-6 pt-8">
-        <div className="inline-block px-4 py-2 rounded-full bg-secondary/10 text-secondary text-sm font-medium mb-4">
-          Invest in Your Energy Future
-        </div>
-        <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-tight">
-          Become an Investor in
-          <br />
-          <span className="bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
-            Renewable Energy
-          </span>
+      <div className="text-center space-y-6 py-12">
+        <h1 className="text-5xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+          Invest in the Energy of Tomorrow
         </h1>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-          Transform your energy consumption into investment opportunities. Own solar panels, wind turbines, and battery storage while reducing your carbon footprint.
+        <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          Democratize renewable energy. Invest in solar, wind, and battery storage—and track your real impact on the energy transition.
         </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-          <Link to="/profile">
-            <Button size="lg" className="bg-primary hover:bg-primary-dark text-lg px-8">
-              Start Investing
+      </div>
+
+      {/* Two Journey Cards */}
+      <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+        <Card className="p-8 space-y-6 hover:shadow-xl transition-all group border-2 hover:border-primary">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-primary flex items-center justify-center">
+            <TrendingUp className="w-8 h-8 text-white" />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-2xl font-bold">I Want to Get Started</h2>
+            <p className="text-muted-foreground">
+              New to energy investment? We'll guide you through understanding your needs, 
+              getting personalized recommendations, and making your first investment.
+            </p>
+          </div>
+          <ul className="space-y-2 text-sm">
+            <li className="flex items-center gap-2">
+              <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+              <span>Build your energy profile in 5 minutes</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+              <span>Get AI-powered investment recommendations</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+              <span>Browse available renewable projects</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+              <span>Invest with confidence</span>
+            </li>
+          </ul>
+          <Link to="/profile" className="block">
+            <Button size="lg" className="w-full bg-gradient-primary group-hover:shadow-lg">
+              Start Your Journey
+              <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
           </Link>
-          <Link to="/dashboard">
-            <Button size="lg" variant="outline" className="text-lg px-8">
+        </Card>
+
+        <Card className="p-8 space-y-6 hover:shadow-xl transition-all group border-2 hover:border-secondary">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-secondary flex items-center justify-center">
+            <LayoutDashboard className="w-8 h-8 text-white" />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-2xl font-bold">I Want to See What's Happening</h2>
+            <p className="text-muted-foreground">
+              Already investing? Track your portfolio performance, monitor your energy impact, 
+              and discover AI-powered optimization opportunities.
+            </p>
+          </div>
+          <ul className="space-y-2 text-sm">
+            <li className="flex items-center gap-2">
+              <div className="w-1.5 h-1.5 rounded-full bg-secondary" />
+              <span>View real-time portfolio performance</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <div className="w-1.5 h-1.5 rounded-full bg-secondary" />
+              <span>Track consumption vs. production</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <div className="w-1.5 h-1.5 rounded-full bg-secondary" />
+              <span>See your environmental impact</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <div className="w-1.5 h-1.5 rounded-full bg-secondary" />
+              <span>Get continuous AI recommendations</span>
+            </li>
+          </ul>
+          <Link to="/dashboard" className="block">
+            <Button size="lg" className="w-full bg-gradient-secondary group-hover:shadow-lg">
               View Dashboard
+              <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
           </Link>
-        </div>
-      </section>
+        </Card>
+      </div>
 
-      {/* Features */}
-      <section className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {[
-          {
-            icon: Zap,
-            title: "Smart Matching",
-            description: "AI-powered recommendations based on your energy profile and goals",
-            color: "text-accent",
-          },
-          {
-            icon: TrendingUp,
-            title: "Maximize Returns",
-            description: "Earn returns while reducing your energy costs and carbon footprint",
-            color: "text-primary",
-          },
-          {
-            icon: Shield,
-            title: "Secure & Transparent",
-            description: "Bank-grade security with full transparency on all investments",
-            color: "text-secondary",
-          },
-          {
-            icon: Leaf,
-            title: "Sustainable Impact",
-            description: "Track your CO₂ reduction and contribution to clean energy",
-            color: "text-success",
-          },
-        ].map((feature, index) => (
-          <Card key={index} className="p-6 space-y-4 border-border hover:shadow-lg transition-all">
-            <div className={cn("w-12 h-12 rounded-xl bg-muted flex items-center justify-center", feature.color)}>
-              <feature.icon className="w-6 h-6" />
-            </div>
-            <h3 className="text-lg font-semibold">{feature.title}</h3>
-            <p className="text-sm text-muted-foreground">{feature.description}</p>
-          </Card>
-        ))}
-      </section>
-
-      {/* How It Works */}
-      <section className="space-y-8">
-        <div className="text-center space-y-2">
-          <h2 className="text-3xl font-bold">How It Works</h2>
-          <p className="text-muted-foreground">Your journey to energy independence in 4 simple steps</p>
-        </div>
+      {/* Platform Features */}
+      <div className="space-y-6">
+        <h2 className="text-3xl font-bold text-center">Platform Features</h2>
         <div className="grid md:grid-cols-4 gap-6">
-          {[
-            { step: 1, title: "Create Profile", description: "Tell us about your energy needs and investment goals" },
-            { step: 2, title: "Get Recommendations", description: "Receive AI-powered asset allocation suggestions" },
-            { step: 3, title: "Choose Investments", description: "Browse available projects and invest easily" },
-            { step: 4, title: "Track & Optimize", description: "Monitor performance and optimize your portfolio" },
-          ].map((item) => (
-            <div key={item.step} className="relative">
-              <Card className="p-6 space-y-3 text-center hover:shadow-lg transition-all">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent text-white font-bold text-xl flex items-center justify-center mx-auto">
-                  {item.step}
-                </div>
-                <h3 className="font-semibold">{item.title}</h3>
-                <p className="text-sm text-muted-foreground">{item.description}</p>
-              </Card>
-              {item.step < 4 && (
-                <div className="hidden md:block absolute top-1/2 -right-3 w-6 h-0.5 bg-gradient-to-r from-primary to-accent" />
-              )}
-            </div>
-          ))}
+          <Card className="p-6 space-y-4 hover:shadow-lg transition-all border-2 hover:border-primary">
+            <Zap className="w-10 h-10 text-primary" />
+            <h3 className="text-lg font-semibold">AI Recommendations</h3>
+            <p className="text-sm text-muted-foreground">
+              Get personalized investment strategies powered by advanced AI analysis.
+            </p>
+          </Card>
+
+          <Card className="p-6 space-y-4 hover:shadow-lg transition-all border-2 hover:border-secondary">
+            <TrendingUp className="w-10 h-10 text-secondary" />
+            <h3 className="text-lg font-semibold">Invoice Integration</h3>
+            <p className="text-sm text-muted-foreground">
+              Connect your Enovos invoice to see real savings and environmental impact.
+            </p>
+          </Card>
+
+          <Card className="p-6 space-y-4 hover:shadow-lg transition-all border-2 hover:border-accent">
+            <Users className="w-10 h-10 text-accent" />
+            <h3 className="text-lg font-semibold">Energy Community</h3>
+            <p className="text-sm text-muted-foreground">
+              Join 12,000+ investors democratizing renewable energy together.
+            </p>
+          </Card>
+
+          <Card className="p-6 space-y-4 hover:shadow-lg transition-all border-2 hover:border-success">
+            <Award className="w-10 h-10 text-success" />
+            <h3 className="text-lg font-semibold">Real-Time Tracking</h3>
+            <p className="text-sm text-muted-foreground">
+              Monitor portfolio performance and energy production live.
+            </p>
+          </Card>
         </div>
-      </section>
+      </div>
+
+      {/* Impact Stats */}
+      <Card className="p-8 bg-gradient-hero border-2 border-primary">
+        <div className="grid md:grid-cols-3 gap-8 text-center">
+          <div>
+            <div className="text-4xl font-bold text-primary mb-2">12,847</div>
+            <div className="text-muted-foreground">Active Investors</div>
+          </div>
+          <div>
+            <div className="text-4xl font-bold text-secondary mb-2">245.8 MW</div>
+            <div className="text-muted-foreground">Renewable Capacity</div>
+          </div>
+          <div>
+            <div className="text-4xl font-bold text-success mb-2">128k tons</div>
+            <div className="text-muted-foreground">CO₂ Avoided Annually</div>
+          </div>
+        </div>
+      </Card>
 
       {/* CTA Section */}
-      <section className="text-center space-y-6 py-12 px-6 rounded-2xl bg-gradient-to-br from-primary/10 via-accent/5 to-secondary/10">
-        <h2 className="text-3xl font-bold">Ready to Start Your Energy Investment Journey?</h2>
-        <p className="text-muted-foreground max-w-xl mx-auto">
-          Join thousands of investors who are already benefiting from renewable energy ownership
+      <Card className="p-12 bg-gradient-primary text-white text-center">
+        <h2 className="text-3xl font-bold mb-4">Ready to Transform Your Energy Future?</h2>
+        <p className="text-white/90 max-w-2xl mx-auto mb-8">
+          Join thousands of investors who are already benefiting from renewable energy ownership while accelerating the transition to 100% clean energy.
         </p>
-        <Link to="/profile">
-          <Button size="lg" className="bg-primary hover:bg-primary-dark text-lg px-8">
-            Get Started Now
-          </Button>
-        </Link>
-      </section>
+        <div className="flex gap-4 justify-center">
+          <Link to="/profile">
+            <Button size="lg" className="bg-white text-primary hover:bg-white/90">
+              Get Started Now
+              <ArrowRight className="ml-2 w-5 h-5" />
+            </Button>
+          </Link>
+          <Link to="/community">
+            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
+              Explore Community
+            </Button>
+          </Link>
+        </div>
+      </Card>
     </div>
   );
-}
-
-function cn(...classes: string[]) {
-  return classes.filter(Boolean).join(" ");
 }

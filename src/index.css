@@ -8,57 +8,57 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Fintech Energy Platform Colors */
+    /* Fintech Energy Platform Colors - Purple & Turquoise */
     --background: 0 0% 100%;
-    --foreground: 215 25% 15%;
+    --foreground: 270 15% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 215 25% 15%;
+    --card-foreground: 270 15% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 15%;
+    --popover-foreground: 270 15% 12%;
 
-    /* Primary: Deep Blue (Trust, Technology) */
-    --primary: 215 85% 45%;
+    /* Primary: Purple (Innovation, Energy) */
+    --primary: 270 75% 60%;
     --primary-foreground: 0 0% 100%;
-    --primary-light: 215 85% 55%;
-    --primary-dark: 215 85% 35%;
+    --primary-light: 270 75% 70%;
+    --primary-dark: 270 75% 50%;
 
-    /* Secondary: Vibrant Green (Sustainability) */
-    --secondary: 150 60% 45%;
+    /* Secondary: Turquoise (Sustainability, Technology) */
+    --secondary: 180 70% 55%;
     --secondary-foreground: 0 0% 100%;
-    --secondary-light: 150 60% 55%;
+    --secondary-light: 180 70% 65%;
 
-    /* Accent: Teal (Energy, Innovation) */
-    --accent: 185 70% 50%;
-    --accent-foreground: 0 0% 100%;
+    /* Accent: Light Turquoise */
+    --accent: 180 80% 65%;
+    --accent-foreground: 270 15% 12%;
 
     /* Muted: Subtle backgrounds */
-    --muted: 215 20% 97%;
-    --muted-foreground: 215 15% 50%;
+    --muted: 270 10% 96%;
+    --muted-foreground: 270 9% 46%;
 
     /* Borders and inputs */
-    --border: 215 20% 90%;
-    --input: 215 20% 90%;
-    --ring: 215 85% 45%;
+    --border: 270 10% 91%;
+    --input: 270 10% 91%;
+    --ring: 270 75% 60%;
 
     /* Destructive */
-    --destructive: 0 75% 55%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
     /* Success */
-    --success: 150 60% 45%;
+    --success: 160 75% 50%;
     --success-foreground: 0 0% 100%;
 
     /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(215 85% 45%), hsl(185 70% 50%));
-    --gradient-secondary: linear-gradient(135deg, hsl(150 60% 45%), hsl(185 70% 50%));
-    --gradient-subtle: linear-gradient(180deg, hsl(0 0% 100%), hsl(215 20% 98%));
+    --gradient-primary: linear-gradient(135deg, hsl(270 75% 60%), hsl(280 70% 65%));
+    --gradient-secondary: linear-gradient(135deg, hsl(180 70% 55%), hsl(190 75% 60%));
+    --gradient-hero: linear-gradient(135deg, hsl(270 75% 60% / 0.1), hsl(180 70% 55% / 0.1));
 
     /* Shadows */
-    --shadow-sm: 0 2px 8px hsla(215, 25%, 15%, 0.05);
-    --shadow-md: 0 4px 16px hsla(215, 25%, 15%, 0.08);
-    --shadow-lg: 0 8px 32px hsla(215, 25%, 15%, 0.12);
+    --shadow-sm: 0 2px 8px hsla(270, 15%, 12%, 0.05);
+    --shadow-md: 0 4px 16px hsla(270, 15%, 12%, 0.08);
+    --shadow-lg: 0 8px 32px hsla(270, 15%, 12%, 0.12);
 
     /* Transitions */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -67,39 +67,42 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 215 30% 8%;
+    --background: 270 20% 8%;
     --foreground: 0 0% 98%;
 
-    --card: 215 25% 12%;
+    --card: 270 18% 11%;
     --card-foreground: 0 0% 98%;
 
-    --popover: 215 25% 12%;
+    --popover: 270 18% 11%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 215 85% 55%;
+    --primary: 270 75% 65%;
     --primary-foreground: 0 0% 100%;
-    --primary-light: 215 85% 65%;
-    --primary-dark: 215 85% 45%;
+    --primary-light: 270 75% 75%;
+    --primary-dark: 270 75% 55%;
 
-    --secondary: 150 60% 50%;
+    --secondary: 180 70% 55%;
     --secondary-foreground: 0 0% 100%;
-    --secondary-light: 150 60% 60%;
+    --secondary-light: 180 70% 65%;
 
-    --accent: 185 70% 55%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 180 80% 65%;
+    --accent-foreground: 270 20% 8%;
 
-    --muted: 215 20% 15%;
-    --muted-foreground: 215 15% 60%;
+    --muted: 270 15% 17%;
+    --muted-foreground: 270 10% 65%;
 
-    --border: 215 20% 20%;
-    --input: 215 20% 20%;
-    --ring: 215 85% 55%;
+    --border: 270 15% 17%;
+    --input: 270 15% 17%;
+    --ring: 270 75% 65%;
 
-    --destructive: 0 75% 60%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 150 60% 50%;
+    --success: 160 75% 50%;
     --success-foreground: 0 0% 100%;
+
+    --gradient-primary: linear-gradient(135deg, hsl(270 75% 65%), hsl(280 70% 68%));
+    --gradient-secondary: linear-gradient(135deg, hsl(180 70% 55%), hsl(190 75% 60%));
   }
 }
 
