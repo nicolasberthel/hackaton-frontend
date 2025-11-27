@@ -2,7 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Sun, Battery, Wind, ArrowRight, TrendingUp, Leaf, Shield, Sparkles } from "lucide-react";
-import { AreaChart, Area, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 
 export default function RecommendationsPage() {
   const location = useLocation();
@@ -213,19 +213,19 @@ export default function RecommendationsPage() {
                 }}
               />
               <Legend />
-              <Line 
+              <Area 
                 type="monotone" 
-                dataKey="consumption"
-                stroke="hsl(0 84% 60%)" 
-                strokeWidth={2}
-                strokeDasharray="5 5"
-                dot={false}
+                dataKey="consumption" 
+                stackId="1"
+                stroke="hsl(var(--primary))" 
+                fill="hsl(var(--primary))"
+                fillOpacity={0.8}
                 name="Consumption"
               />
               <Area 
                 type="monotone" 
                 dataKey="solar" 
-                stackId="1"
+                stackId="2"
                 stroke="hsl(var(--accent))" 
                 fill="hsl(var(--accent))"
                 fillOpacity={0.8}
@@ -234,7 +234,7 @@ export default function RecommendationsPage() {
               <Area 
                 type="monotone" 
                 dataKey="wind" 
-                stackId="1"
+                stackId="2"
                 stroke="hsl(var(--secondary))" 
                 fill="hsl(var(--secondary))"
                 fillOpacity={0.8}
@@ -243,7 +243,7 @@ export default function RecommendationsPage() {
               <Area 
                 type="monotone" 
                 dataKey="battery" 
-                stackId="1"
+                stackId="2"
                 stroke="hsl(var(--muted-foreground))" 
                 fill="hsl(var(--muted-foreground))"
                 fillOpacity={0.7}
