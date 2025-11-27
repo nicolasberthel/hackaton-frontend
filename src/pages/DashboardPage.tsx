@@ -208,6 +208,44 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* AI Recommendations */}
+      <Card className="p-6 space-y-4">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+            <span className="text-white text-sm font-bold">AI</span>
+          </div>
+          <h2 className="text-xl font-bold">Smart Recommendations</h2>
+        </div>
+
+        <div className="space-y-3">
+          {aiRecommendations.map((rec, index) => (
+            <div
+              key={index}
+              className="flex items-start gap-3 p-4 rounded-lg bg-muted/50 hover:bg-muted transition-all"
+            >
+              <AlertCircle
+                className={`w-5 h-5 mt-0.5 ${
+                  rec.priority === "high"
+                    ? "text-primary"
+                    : rec.priority === "medium"
+                    ? "text-accent"
+                    : "text-muted-foreground"
+                }`}
+              />
+              <div className="flex-1">
+                <p className="text-sm">{rec.message}</p>
+              </div>
+              <Badge
+                variant={rec.priority === "high" ? "default" : "outline"}
+                className={rec.priority === "high" ? "bg-primary" : ""}
+              >
+                {rec.priority}
+              </Badge>
+            </div>
+          ))}
+        </div>
+      </Card>
+
       {/* Energy Load Profile Chart */}
       <Card className="p-8 space-y-6">
         <div>
@@ -276,44 +314,6 @@ export default function DashboardPage() {
               />
             </AreaChart>
           </ResponsiveContainer>
-        </div>
-      </Card>
-
-      {/* AI Recommendations */}
-      <Card className="p-6 space-y-4">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-            <span className="text-white text-sm font-bold">AI</span>
-          </div>
-          <h2 className="text-xl font-bold">Smart Recommendations</h2>
-        </div>
-
-        <div className="space-y-3">
-          {aiRecommendations.map((rec, index) => (
-            <div
-              key={index}
-              className="flex items-start gap-3 p-4 rounded-lg bg-muted/50 hover:bg-muted transition-all"
-            >
-              <AlertCircle
-                className={`w-5 h-5 mt-0.5 ${
-                  rec.priority === "high"
-                    ? "text-primary"
-                    : rec.priority === "medium"
-                    ? "text-accent"
-                    : "text-muted-foreground"
-                }`}
-              />
-              <div className="flex-1">
-                <p className="text-sm">{rec.message}</p>
-              </div>
-              <Badge
-                variant={rec.priority === "high" ? "default" : "outline"}
-                className={rec.priority === "high" ? "bg-primary" : ""}
-              >
-                {rec.priority}
-              </Badge>
-            </div>
-          ))}
         </div>
       </Card>
 
