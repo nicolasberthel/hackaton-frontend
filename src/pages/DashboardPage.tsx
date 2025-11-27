@@ -68,33 +68,33 @@ export default function DashboardPage() {
     },
   ];
 
-  // Load profile data (24 hours) - optimized battery usage
+  // Load profile data (24 hours)
   const loadProfileData = [
-    { hour: "0", solar: 0, wind: 0.6, battery: 0, consumption: 0.5 },
-    { hour: "1", solar: 0, wind: 0.5, battery: 0, consumption: 0.4 },
-    { hour: "2", solar: 0, wind: 0.5, battery: 0, consumption: 0.4 },
-    { hour: "3", solar: 0, wind: 0.5, battery: 0, consumption: 0.4 },
-    { hour: "4", solar: 0, wind: 0.5, battery: 0, consumption: 0.5 },
-    { hour: "5", solar: 0, wind: 0.4, battery: 0.2, consumption: 0.6 },
-    { hour: "6", solar: 0.1, wind: 0.4, battery: 0.3, consumption: 0.8 },
-    { hour: "7", solar: 0.3, wind: 0.4, battery: 0.3, consumption: 1.0 },
-    { hour: "8", solar: 0.6, wind: 0.4, battery: 0.1, consumption: 1.1 },
-    { hour: "9", solar: 1.0, wind: 0.5, battery: 0, consumption: 1.0 },
-    { hour: "10", solar: 1.3, wind: 0.5, battery: 0, consumption: 0.9 },
-    { hour: "11", solar: 1.5, wind: 0.5, battery: 0, consumption: 0.9 },
-    { hour: "12", solar: 1.6, wind: 0.4, battery: 0, consumption: 0.8 },
-    { hour: "13", solar: 1.5, wind: 0.5, battery: 0, consumption: 0.9 },
-    { hour: "14", solar: 1.3, wind: 0.5, battery: 0, consumption: 0.8 },
-    { hour: "15", solar: 1.0, wind: 0.5, battery: 0, consumption: 0.8 },
-    { hour: "16", solar: 0.7, wind: 0.5, battery: 0, consumption: 0.9 },
-    { hour: "17", solar: 0.4, wind: 0.5, battery: 0.2, consumption: 1.1 },
-    { hour: "18", solar: 0.2, wind: 0.5, battery: 0.6, consumption: 1.3 },
-    { hour: "19", solar: 0, wind: 0.5, battery: 0.9, consumption: 1.4 },
-    { hour: "20", solar: 0, wind: 0.5, battery: 0.7, consumption: 1.2 },
-    { hour: "21", solar: 0, wind: 0.5, battery: 0.5, consumption: 1.0 },
-    { hour: "22", solar: 0, wind: 0.5, battery: 0.3, consumption: 0.8 },
-    { hour: "23", solar: 0, wind: 0.5, battery: 0.1, consumption: 0.6 },
-    { hour: "24", solar: 0, wind: 0.5, battery: 0, consumption: 0.5 },
+    { hour: "0", solar: 0, wind: 0.6, battery: 0.3, consumption: 0.5 },
+    { hour: "1", solar: 0, wind: 0.5, battery: 0.3, consumption: 0.4 },
+    { hour: "2", solar: 0, wind: 0.7, battery: 0.2, consumption: 0.4 },
+    { hour: "3", solar: 0, wind: 0.8, battery: 0.2, consumption: 0.4 },
+    { hour: "4", solar: 0, wind: 0.6, battery: 0.3, consumption: 0.5 },
+    { hour: "5", solar: 0, wind: 0.5, battery: 0.4, consumption: 0.6 },
+    { hour: "6", solar: 0.1, wind: 0.5, battery: 0.4, consumption: 0.8 },
+    { hour: "7", solar: 0.3, wind: 0.4, battery: 0.5, consumption: 1.0 },
+    { hour: "8", solar: 0.6, wind: 0.4, battery: 0.4, consumption: 1.1 },
+    { hour: "9", solar: 1.0, wind: 0.5, battery: 0.3, consumption: 1.0 },
+    { hour: "10", solar: 1.3, wind: 0.6, battery: 0.2, consumption: 0.9 },
+    { hour: "11", solar: 1.5, wind: 0.5, battery: 0.2, consumption: 0.9 },
+    { hour: "12", solar: 1.6, wind: 0.4, battery: 0.1, consumption: 0.8 },
+    { hour: "13", solar: 1.5, wind: 0.5, battery: 0.2, consumption: 0.9 },
+    { hour: "14", solar: 1.3, wind: 0.6, battery: 0.2, consumption: 0.8 },
+    { hour: "15", solar: 1.0, wind: 0.7, battery: 0.3, consumption: 0.8 },
+    { hour: "16", solar: 0.7, wind: 0.8, battery: 0.4, consumption: 0.9 },
+    { hour: "17", solar: 0.4, wind: 0.9, battery: 0.5, consumption: 1.1 },
+    { hour: "18", solar: 0.2, wind: 1.0, battery: 0.6, consumption: 1.3 },
+    { hour: "19", solar: 0, wind: 0.9, battery: 0.7, consumption: 1.4 },
+    { hour: "20", solar: 0, wind: 0.8, battery: 0.6, consumption: 1.2 },
+    { hour: "21", solar: 0, wind: 0.7, battery: 0.5, consumption: 1.0 },
+    { hour: "22", solar: 0, wind: 0.6, battery: 0.4, consumption: 0.8 },
+    { hour: "23", solar: 0, wind: 0.6, battery: 0.3, consumption: 0.6 },
+    { hour: "24", solar: 0, wind: 0.6, battery: 0.3, consumption: 0.5 },
   ];
 
   // Asset ownership breakdown
@@ -276,43 +276,41 @@ export default function DashboardPage() {
                 }}
               />
               <Legend />
-              {/* Production sources stacked */}
+              <Area 
+                type="monotone" 
+                dataKey="consumption" 
+                stackId="1"
+                stroke="hsl(var(--primary))" 
+                fill="hsl(var(--primary))"
+                fillOpacity={0.8}
+                name="Consumption"
+              />
               <Area 
                 type="monotone" 
                 dataKey="solar" 
-                stackId="production"
+                stackId="2"
                 stroke="hsl(var(--accent))" 
                 fill="hsl(var(--accent))"
-                fillOpacity={0.7}
-                name="Solar Production"
+                fillOpacity={0.8}
+                name="Solar"
               />
               <Area 
                 type="monotone" 
                 dataKey="wind" 
-                stackId="production"
+                stackId="2"
                 stroke="hsl(var(--secondary))" 
                 fill="hsl(var(--secondary))"
-                fillOpacity={0.7}
-                name="Wind Production"
+                fillOpacity={0.8}
+                name="Wind"
               />
               <Area 
                 type="monotone" 
                 dataKey="battery" 
-                stackId="production"
-                stroke="hsl(var(--chart-3))" 
-                fill="hsl(var(--chart-3))"
-                fillOpacity={0.7}
-                name="Battery Discharge"
-              />
-              {/* Consumption shown on top to compare */}
-              <Area 
-                type="monotone" 
-                dataKey="consumption" 
-                stroke="hsl(var(--primary))" 
-                fill="transparent"
-                strokeWidth={3}
-                strokeDasharray="5 5"
-                name="Your Consumption"
+                stackId="2"
+                stroke="hsl(var(--muted-foreground))" 
+                fill="hsl(var(--muted-foreground))"
+                fillOpacity={0.6}
+                name="Battery"
               />
             </AreaChart>
           </ResponsiveContainer>
