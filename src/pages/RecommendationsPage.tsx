@@ -306,7 +306,7 @@ export default function RecommendationsPage() {
         <Link to="/profile">
           <Button variant="outline">Modify Profile</Button>
         </Link>
-        <Link to="/opportunities">
+        <Link to="/opportunities" state={{ recommendations, totalInvestment, profile }}>
           <Button className="bg-primary hover:bg-primary-dark">
             View Available Projects
             <ArrowRight className="ml-2 w-4 h-4" />

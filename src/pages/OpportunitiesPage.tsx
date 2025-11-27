@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Sun, Battery, Wind, MapPin, TrendingUp, Leaf, Clock } from "lucide-react";
+import { Sun, Battery, Wind, MapPin, TrendingUp, Leaf, Clock, Sparkles, CheckCircle2 } from "lucide-react";
 
 const projects = [
   {
@@ -81,7 +81,28 @@ const projects = [
 ];
 
 export default function OpportunitiesPage() {
+  const location = useLocation();
+  const recommendations = location.state?.recommendations;
+  const totalInvestment = location.state?.totalInvestment || 5000;
+  
   const [filter, setFilter] = useState<"all" | "solar" | "battery" | "wind">("all");
+  const [selectedProjects, setSelectedProjects] = useState<number[]>([]);
+  const [mode, setMode] = useState<"ai" | "manual">("ai");
+
+  // AI pre-selects projects based on recommendations
+  const aiSelections = recommendations ? [
+    { projectId: 1, amount: Math.round(recommendations.solar.investment / 1250) * 1250 }, // Solar
+    { projectId: 4, amount: Math.round((recommendations.solar.investment - Math.round(recommendations.solar.investment / 1250) * 1250)) }, // More solar if budget allows
+    { projectId: 2, amount: Math.round(recommendations.battery.investment / 750) * 750 }, // Battery
+    { projectId: 5, amount: Math.round((recommendations.battery.investment - Math.round(recommendations.battery.investment / 750) * 750)) }, // More battery if needed
+    { projectId: 3, amount: Math.round(recommendations.wind.investment / 850) * 850 }, // Wind
+  ].filter(s => s.amount > 0) : [];
+
+  const getAISelectedAmount = (projectId: number) => {
+    return aiSelections.find(s => s.projectId === projectId)?.amount || 0;
+  };
+
+  const totalAIInvestment = aiSelections.reduce((sum, s) => sum + s.amount, 0);
 
   const filteredProjects = filter === "all" ? projects : projects.filter((p) => p.type === filter);
 
@@ -119,8 +140,78 @@ export default function OpportunitiesPage() {
         <p className="text-muted-foreground">
           Browse available renewable energy projects and start investing today
         </p>
+      </div>
 
-        {/* Filters */}
+      {/* AI Selection Summary */}
+      {recommendations && (
+        <Card className="p-6 bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20">
+          <div className="flex gap-4">
+            <div className="flex-shrink-0">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-primary" />
+              </div>
+            </div>
+            <div className="flex-1 space-y-4">
+              <div>
+                <h3 className="font-semibold text-lg mb-1">AI-Selected Portfolio Ready</h3>
+                <p className="text-sm text-muted-foreground">
+                  Based on your recommended portfolio, I've pre-selected the optimal projects to match your {recommendations.solar.percentage}% solar, {recommendations.battery.percentage}% battery, and {recommendations.wind.percentage}% wind allocation.
+                </p>
+              </div>
+
+              {/* Selected Projects Overview */}
+              <div className="grid md:grid-cols-3 gap-4">
+                <div className="p-4 rounded-lg bg-card border">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Sun className="w-5 h-5 text-accent" />
+                    <span className="font-semibold">Solar Projects</span>
+                  </div>
+                  <div className="text-2xl font-bold text-primary">€{recommendations.solar.investment.toLocaleString()}</div>
+                  <div className="text-sm text-muted-foreground">{recommendations.solar.percentage}% of portfolio</div>
+                </div>
+                <div className="p-4 rounded-lg bg-card border">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Battery className="w-5 h-5 text-secondary" />
+                    <span className="font-semibold">Battery Storage</span>
+                  </div>
+                  <div className="text-2xl font-bold text-primary">€{recommendations.battery.investment.toLocaleString()}</div>
+                  <div className="text-sm text-muted-foreground">{recommendations.battery.percentage}% of portfolio</div>
+                </div>
+                <div className="p-4 rounded-lg bg-card border">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Wind className="w-5 h-5 text-primary" />
+                    <span className="font-semibold">Wind Energy</span>
+                  </div>
+                  <div className="text-2xl font-bold text-primary">€{recommendations.wind.investment.toLocaleString()}</div>
+                  <div className="text-sm text-muted-foreground">{recommendations.wind.percentage}% of portfolio</div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3 pt-2">
+                <Link to="/confirmation" state={{ aiSelections, totalInvestment: totalAIInvestment, recommendations }} className="flex-1">
+                  <Button className="w-full bg-primary hover:bg-primary-dark">
+                    <CheckCircle2 className="w-4 h-4 mr-2" />
+                    Proceed with AI Selection
+                  </Button>
+                </Link>
+                <Button variant="outline" onClick={() => setMode("manual")}>
+                  Customize Manually
+                </Button>
+              </div>
+            </div>
+          </div>
+        </Card>
+      )}
+
+      {/* Filters */}
+      <div className="space-y-4">
+
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-semibold">
+            {recommendations && mode === "ai" ? "AI-Recommended Projects (Pre-Selected)" : "Available Projects"}
+          </h2>
+        </div>
         <div className="flex gap-2 flex-wrap">
           <Button
             variant={filter === "all" ? "default" : "outline"}
@@ -156,11 +247,18 @@ export default function OpportunitiesPage() {
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredProjects.map((project) => {
           const Icon = getIcon(project.type);
+          const isAISelected = recommendations && getAISelectedAmount(project.id) > 0;
           return (
-            <Card key={project.id} className="overflow-hidden hover:shadow-lg transition-all group">
+            <Card key={project.id} className={`overflow-hidden hover:shadow-lg transition-all group ${isAISelected ? 'ring-2 ring-primary' : ''}`}>
               {/* Project Image/Icon */}
-              <div className="h-32 bg-gradient-to-br from-primary/10 via-accent/10 to-secondary/10 flex items-center justify-center text-6xl">
+              <div className="h-32 bg-gradient-to-br from-primary/10 via-accent/10 to-secondary/10 flex items-center justify-center text-6xl relative">
                 {project.image}
+                {isAISelected && (
+                  <div className="absolute top-2 right-2 bg-primary text-white px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
+                    <Sparkles className="w-3 h-3" />
+                    AI Pick
+                  </div>
+                )}
               </div>
 
               {/* Content */}
@@ -204,6 +302,12 @@ export default function OpportunitiesPage() {
                     <span className="text-2xl font-bold text-primary">€{project.price}</span>
                   </div>
 
+                  {isAISelected && (
+                    <div className="p-2 bg-primary/10 rounded-lg text-sm text-center">
+                      <span className="font-semibold text-primary">AI Allocated: €{getAISelectedAmount(project.id).toLocaleString()}</span>
+                    </div>
+                  )}
+
                   {project.availability === "waitlist" ? (
                     <Button variant="outline" className="w-full" disabled>
                       <Clock className="w-4 h-4 mr-2" />
@@ -212,7 +316,7 @@ export default function OpportunitiesPage() {
                   ) : (
                     <Link to="/confirmation" className="block">
                       <Button className="w-full bg-primary hover:bg-primary-dark group-hover:scale-105 transition-transform">
-                        Invest Now
+                        {isAISelected ? "Included in AI Selection" : "Invest Now"}
                       </Button>
                     </Link>
                   )}
