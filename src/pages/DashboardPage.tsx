@@ -3,9 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Sun, Battery, Wind, TrendingUp, Leaf, DollarSign, AlertCircle, Plus } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { useEffect, useState } from "react";
-import { getLoadProfileByPod, calculateBatteryUsage } from "@/data/loadProfiles";
 
 export default function DashboardPage() {
   const location = useLocation();
@@ -41,11 +40,27 @@ export default function DashboardPage() {
     autonomy: 65,
   };
 
-  // Get load profile data - use from portfolio or regenerate from POD
-  // Always recalculate battery usage to ensure it's correct
-  const rawLoadProfile = portfolioData?.loadProfileData || 
-    getLoadProfileByPod(portfolioData?.profile?.podNumber || "");
-  const loadProfileData = calculateBatteryUsage(rawLoadProfile);
+  // Monthly financial benefits data - calculated based on investment
+  // Savings scale with investment: base €150/month per €5000 invested
+  // Revenue is approximately 40-45% of savings from selling excess production
+  const savingsMultiplier = totalInvestment / 5000;
+  const monthlyData = [
+    { month: "Jan", savings: Math.round(120 * savingsMultiplier), revenue: Math.round(52 * savingsMultiplier) },
+    { month: "Feb", savings: Math.round(128 * savingsMultiplier), revenue: Math.round(55 * savingsMultiplier) },
+    { month: "Mar", savings: Math.round(145 * savingsMultiplier), revenue: Math.round(63 * savingsMultiplier) },
+    { month: "Apr", savings: Math.round(162 * savingsMultiplier), revenue: Math.round(72 * savingsMultiplier) },
+    { month: "May", savings: Math.round(175 * savingsMultiplier), revenue: Math.round(82 * savingsMultiplier) },
+    { month: "Jun", savings: Math.round(185 * savingsMultiplier), revenue: Math.round(88 * savingsMultiplier) },
+    { month: "Jul", savings: Math.round(190 * savingsMultiplier), revenue: Math.round(92 * savingsMultiplier) },
+    { month: "Aug", savings: Math.round(182 * savingsMultiplier), revenue: Math.round(86 * savingsMultiplier) },
+    { month: "Sep", savings: Math.round(165 * savingsMultiplier), revenue: Math.round(75 * savingsMultiplier) },
+    { month: "Oct", savings: Math.round(148 * savingsMultiplier), revenue: Math.round(65 * savingsMultiplier) },
+    { month: "Nov", savings: Math.round(132 * savingsMultiplier), revenue: Math.round(57 * savingsMultiplier) },
+    { month: "Dec", savings: Math.round(122 * savingsMultiplier), revenue: Math.round(50 * savingsMultiplier) }
+  ];
+  
+  const annualSavings = monthlyData.reduce((sum, m) => sum + m.savings, 0);
+  const annualRevenue = monthlyData.reduce((sum, m) => sum + m.revenue, 0);
 
   const investments = [
     {
@@ -278,80 +293,90 @@ export default function DashboardPage() {
         </div>
       </Card>
 
-      {/* Energy Load Profile Chart */}
+      {/* Monthly Financial Benefits Chart */}
       <Card className="p-8 space-y-6">
-        <div>
-          <h2 className="text-2xl font-bold mb-2">Your Target Load Profile</h2>
-          <p className="text-muted-foreground mb-2">
-            24-hour overview showing how your assets cover your energy needs
-          </p>
-          <p className="text-sm text-muted-foreground italic">
-            <strong>Note:</strong> This profile represents your target on good days and will of course depend on outside conditions (weather, seasonality). The current set-up is designed to optimize your overall year performance.
+        <div className="space-y-2">
+          <h2 className="text-2xl font-bold">Monthly Financial Benefits</h2>
+          <p className="text-muted-foreground">
+            Energy consumption cost reduction and revenue from selling excess production
           </p>
         </div>
-        
-        <div className="h-[400px] w-full">
+
+        <div className="h-96">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={loadProfileData}>
+            <BarChart data={monthlyData}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
               <XAxis 
-                dataKey="hour" 
-                label={{ value: 'Time (hours)', position: 'insideBottom', offset: -5 }}
-                className="text-muted-foreground"
+                dataKey="month" 
+                className="text-sm"
+                tick={{ fill: 'hsl(var(--muted-foreground))' }}
               />
               <YAxis 
-                label={{ value: 'kWh', angle: -90, position: 'insideLeft' }}
-                className="text-muted-foreground"
+                className="text-sm"
+                tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                label={{ value: 'Amount (€)', angle: -90, position: 'insideLeft', fill: 'hsl(var(--muted-foreground))' }}
               />
               <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: 'hsl(var(--card))',
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--background))',
                   border: '1px solid hsl(var(--border))',
                   borderRadius: '8px'
                 }}
+                formatter={(value: number) => [`€${value}`, '']}
               />
-              <Legend />
-              <Area 
-                type="monotone" 
-                dataKey="consumption" 
-                stackId="1"
-                stroke="hsl(0, 84%, 60%)" 
-                strokeWidth={3}
-                strokeDasharray="5 5"
-                fill="none"
-                name="Consumption"
+              <Legend 
+                wrapperStyle={{
+                  paddingTop: '20px'
+                }}
               />
-              <Area 
-                type="monotone" 
-                dataKey="wind" 
-                stackId="2"
-                stroke="hsl(270, 70%, 60%)" 
-                fill="hsl(270, 70%, 60%)"
-                fillOpacity={0.8}
-                name="Wind"
+              <Bar 
+                dataKey="savings" 
+                stackId="a" 
+                fill="hsl(var(--primary))" 
+                name="Energy Cost Reduction"
+                radius={[0, 0, 4, 4]}
               />
-              <Area 
-                type="monotone" 
-                dataKey="solar" 
-                stackId="2"
-                stroke="hsl(var(--accent))" 
-                fill="hsl(var(--accent))"
-                fillOpacity={0.8}
-                name="Solar"
+              <Bar 
+                dataKey="revenue" 
+                stackId="a" 
+                fill="hsl(var(--secondary))" 
+                name="Production Revenue"
+                radius={[4, 4, 0, 0]}
               />
-              <Area 
-                type="monotone" 
-                dataKey="battery" 
-                stackId="2"
-                stroke="hsl(var(--muted-foreground))" 
-                fill="hsl(var(--muted-foreground))"
-                fillOpacity={0.7}
-                name="Battery"
-              />
-            </AreaChart>
+            </BarChart>
           </ResponsiveContainer>
         </div>
       </Card>
+
+      {/* Annual Summary */}
+      <div className="grid md:grid-cols-3 gap-6">
+        <Card className="p-6 space-y-4">
+          <div className="flex items-center gap-2 text-primary">
+            <TrendingUp className="w-5 h-5" />
+            <span className="text-sm font-medium">Annual Savings</span>
+          </div>
+          <div className="text-3xl font-bold">€{annualSavings.toLocaleString()}</div>
+          <p className="text-sm text-muted-foreground">Total energy cost reduction</p>
+        </Card>
+
+        <Card className="p-6 space-y-4">
+          <div className="flex items-center gap-2 text-secondary">
+            <DollarSign className="w-5 h-5" />
+            <span className="text-sm font-medium">Annual Revenue</span>
+          </div>
+          <div className="text-3xl font-bold">€{annualRevenue.toLocaleString()}</div>
+          <p className="text-sm text-muted-foreground">From excess production sales</p>
+        </Card>
+
+        <Card className="p-6 space-y-4 border-2 border-success bg-gradient-hero">
+          <div className="flex items-center gap-2 text-success">
+            <DollarSign className="w-5 h-5" />
+            <span className="text-sm font-medium">Total Annual Benefit</span>
+          </div>
+          <div className="text-3xl font-bold text-success">€{(annualSavings + annualRevenue).toLocaleString()}</div>
+          <p className="text-sm text-muted-foreground">Combined financial return</p>
+        </Card>
+      </div>
 
     </div>
   );

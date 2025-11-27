@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from "react-router-dom";
-import { Home, User, TrendingUp, ShoppingBag, CheckCircle, LayoutDashboard } from "lucide-react";
+import { Home, User, TrendingUp, ShoppingBag, LayoutDashboard } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navigation = [
@@ -7,7 +7,6 @@ const navigation = [
   { name: "Get Started", path: "/profile", icon: TrendingUp },
   { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
   { name: "Opportunities", path: "/opportunities", icon: ShoppingBag },
-  { name: "Invoice", path: "/invoice", icon: CheckCircle },
   { name: "Community", path: "/community", icon: User },
 ];
 
