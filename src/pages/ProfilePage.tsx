@@ -207,7 +207,7 @@ export default function ProfilePage() {
         </Card>
       )}
 
-      {/* Step 3: Budget & Risk */}
+      {/* Step 3: Budget */}
       {step === 3 && (
         <Card className="p-8 space-y-6 animate-fade-in">
           <div className="space-y-2">
@@ -231,34 +231,10 @@ export default function ProfilePage() {
               <span>€50,000</span>
             </div>
           </div>
-
-          <div className="space-y-4 pt-4">
-            <Label>Risk Appetite</Label>
-            <RadioGroup value={profile.riskAppetite} onValueChange={(value) => setProfile({ ...profile, riskAppetite: value })}>
-              <div className="space-y-3">
-                {[
-                  { value: "conservative", label: "Conservative", description: "Focus on stable returns with minimal risk" },
-                  { value: "moderate", label: "Moderate", description: "Balance between risk and return" },
-                  { value: "aggressive", label: "Aggressive", description: "Higher risk for potentially higher returns" },
-                ].map((option) => (
-                  <label
-                    key={option.value}
-                    className="flex items-start gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all hover:border-primary has-[:checked]:border-primary has-[:checked]:bg-primary/5"
-                  >
-                    <RadioGroupItem value={option.value} className="mt-1" />
-                    <div className="flex-1">
-                      <div className="font-semibold mb-1">{option.label}</div>
-                      <p className="text-sm text-muted-foreground">{option.description}</p>
-                    </div>
-                  </label>
-                ))}
-              </div>
-            </RadioGroup>
-          </div>
         </Card>
       )}
 
-      {/* Step 4: Objectives */}
+      {/* Step 4: Objectives & Risk */}
       {step === 4 && (
         <Card className="p-8 space-y-6 animate-fade-in">
           <div className="space-y-2">
@@ -295,6 +271,33 @@ export default function ProfilePage() {
                 </div>
               </button>
             ))}
+          </div>
+
+          <div className="border-t pt-6 space-y-4">
+            <div className="space-y-2">
+              <Label className="text-base">Risk Appetite</Label>
+              <p className="text-sm text-muted-foreground">What level of risk are you comfortable with?</p>
+            </div>
+            <RadioGroup value={profile.riskAppetite} onValueChange={(value) => setProfile({ ...profile, riskAppetite: value })}>
+              <div className="space-y-3">
+                {[
+                  { value: "conservative", label: "Conservative", description: "Focus on stable returns with minimal risk" },
+                  { value: "moderate", label: "Moderate", description: "Balance between risk and return" },
+                  { value: "aggressive", label: "Aggressive", description: "Higher risk for potentially higher returns" },
+                ].map((option) => (
+                  <label
+                    key={option.value}
+                    className="flex items-start gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all hover:border-primary has-[:checked]:border-primary has-[:checked]:bg-primary/5"
+                  >
+                    <RadioGroupItem value={option.value} className="mt-1" />
+                    <div className="flex-1">
+                      <div className="font-semibold mb-1">{option.label}</div>
+                      <p className="text-sm text-muted-foreground">{option.description}</p>
+                    </div>
+                  </label>
+                ))}
+              </div>
+            </RadioGroup>
           </div>
         </Card>
       )}
