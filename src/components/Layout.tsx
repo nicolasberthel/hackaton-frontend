@@ -4,11 +4,11 @@ import { cn } from "@/lib/utils";
 
 const navigation = [
   { name: "Home", path: "/", icon: Home },
-  { name: "Profile", path: "/profile", icon: User },
-  { name: "Recommendations", path: "/recommendations", icon: TrendingUp },
-  { name: "Opportunities", path: "/opportunities", icon: ShoppingBag },
-  { name: "Confirmation", path: "/confirmation", icon: CheckCircle },
+  { name: "Get Started", path: "/profile", icon: TrendingUp },
   { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
+  { name: "Opportunities", path: "/opportunities", icon: ShoppingBag },
+  { name: "Invoice", path: "/invoice", icon: CheckCircle },
+  { name: "Community", path: "/community", icon: User },
 ];
 
 export default function Layout() {
