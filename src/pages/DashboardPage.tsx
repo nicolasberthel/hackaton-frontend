@@ -70,7 +70,7 @@ export default function DashboardPage() {
       name: "Luxembourg Solar Park Phase 2",
       type: "solar",
       icon: Sun,
-      capacity: ((recommendations.solar.investment / 1111 / 2).toFixed(1)) + " kWc",
+      capacity: ((recommendations.solar.investment / 1111 / 2).toFixed(2)) + " kWc",
       invested: Math.round(recommendations.solar.investment * 0.6),
       currentValue: Math.round(recommendations.solar.investment * 0.6 * 1.07),
       return: 7.2,
@@ -81,7 +81,7 @@ export default function DashboardPage() {
       name: "Community Battery Storage",
       type: "battery",
       icon: Battery,
-      capacity: ((recommendations.battery.investment / 625 / 2).toFixed(0)) + " kWh",
+      capacity: ((recommendations.battery.investment / 625 / 2).toFixed(2)) + " kWh",
       invested: Math.round(recommendations.battery.investment * 0.5),
       currentValue: Math.round(recommendations.battery.investment * 0.5 * 1.06),
       return: 6.0,
@@ -92,7 +92,7 @@ export default function DashboardPage() {
       name: "Northern Wind Farm",
       type: "wind",
       icon: Wind,
-      capacity: ((recommendations.wind.investment / 2500 / 2).toFixed(1)) + " kW",
+      capacity: ((recommendations.wind.investment / 2500 / 2).toFixed(2)) + " kW",
       invested: Math.round(recommendations.wind.investment * 0.6),
       currentValue: Math.round(recommendations.wind.investment * 0.6 * 1.065),
       return: 6.5,
@@ -124,32 +124,32 @@ export default function DashboardPage() {
     { 
       type: "Solar", 
       icon: Sun, 
-      capacity: ((recommendations.solar.investment / 1111).toFixed(1)) + " kWc", 
+      capacity: ((recommendations.solar.investment / 1111).toFixed(2)) + " kWc", 
       percentage: recommendations.solar.percentage, 
       amount: recommendations.solar.investment, 
       color: "accent", 
       currentPrice: Math.round(recommendations.solar.investment * 1.04), 
-      priceChange: 4.2 
+      priceChange: 4.20 
     },
     { 
       type: "Battery", 
       icon: Battery, 
-      capacity: ((recommendations.battery.investment / 625).toFixed(0)) + " kWh", 
+      capacity: ((recommendations.battery.investment / 625).toFixed(2)) + " kWh", 
       percentage: recommendations.battery.percentage, 
       amount: recommendations.battery.investment, 
       color: "secondary", 
       currentPrice: Math.round(recommendations.battery.investment * 0.98), 
-      priceChange: -1.8 
+      priceChange: -1.80 
     },
     { 
       type: "Wind", 
       icon: Wind, 
-      capacity: ((recommendations.wind.investment / 2500).toFixed(1)) + " kW", 
+      capacity: ((recommendations.wind.investment / 2500).toFixed(2)) + " kW", 
       percentage: recommendations.wind.percentage, 
       amount: recommendations.wind.investment, 
       color: "primary", 
       currentPrice: Math.round(recommendations.wind.investment * 1.025), 
-      priceChange: 2.5 
+      priceChange: 2.50 
     },
   ];
 
@@ -177,7 +177,7 @@ export default function DashboardPage() {
             <span>Total Value</span>
           </div>
           <div className="text-3xl font-bold text-primary">€{portfolio.totalValue.toLocaleString()}</div>
-          <div className="text-sm text-success">+€{portfolio.totalReturn} ({portfolio.returnPercentage}%)</div>
+          <div className="text-sm text-success">+€{portfolio.totalReturn.toLocaleString()} ({portfolio.returnPercentage.toFixed(2)}%)</div>
         </Card>
 
         <Card className="p-6 space-y-2">
@@ -185,7 +185,7 @@ export default function DashboardPage() {
             <TrendingUp className="w-4 h-4" />
             <span>Total Return</span>
           </div>
-          <div className="text-3xl font-bold text-primary">{portfolio.returnPercentage}%</div>
+          <div className="text-3xl font-bold text-primary">{portfolio.returnPercentage.toFixed(2)}%</div>
           <div className="text-sm text-muted-foreground">Annual average</div>
         </Card>
 
@@ -194,7 +194,7 @@ export default function DashboardPage() {
             <Leaf className="w-4 h-4" />
             <span>CO₂ Saved</span>
           </div>
-          <div className="text-3xl font-bold text-secondary">{portfolio.co2Saved}t</div>
+          <div className="text-3xl font-bold text-secondary">{portfolio.co2Saved.toFixed(2)} t</div>
           <div className="text-sm text-muted-foreground">This year</div>
         </Card>
 
@@ -234,16 +234,16 @@ export default function DashboardPage() {
                 <div className="space-y-2 pt-2 border-t">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Invested</span>
-                    <span className="font-medium">€{investment.invested}</span>
+                    <span className="font-medium">€{investment.invested.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Current Value</span>
-                    <span className="font-bold text-primary">€{investment.currentValue}</span>
+                    <span className="font-bold text-primary">€{investment.currentValue.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Gain</span>
                     <span className="font-bold text-success">
-                      +€{gain} ({gainPercentage}%)
+                      +€{gain.toLocaleString()} ({gainPercentage}%)
                     </span>
                   </div>
                 </div>
