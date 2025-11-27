@@ -7,12 +7,12 @@ export default function HomePage() {
   return (
     <div className="space-y-16 pb-20">
       {/* Hero Section */}
-      <div className="text-center space-y-6 py-12">
-        <h1 className="text-5xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+      <div className="text-center space-y-8 py-12">
+        <h1 className="text-5xl font-bold leading-tight bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent mb-6">
           Invest in the Energy of Tomorrow
         </h1>
-        <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-          Democratize renewable energy. Invest in solar, wind, and battery storage—and track your real impact on the energy transition.
+        <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+          Everyone in Luxembourg can shape our energy future. Small investments add up—together, we're building a sustainable energy landscape, one contribution at a time.
         </p>
       </div>
 
