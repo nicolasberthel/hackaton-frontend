@@ -281,7 +281,7 @@ export default function ProfilePage() {
             <RadioGroup value={profile.riskAppetite} onValueChange={(value) => setProfile({ ...profile, riskAppetite: value })}>
               <div className="space-y-3">
                 {[
-                  { value: "conservative", label: "Conservative", description: "Focus on stable returns with minimal risk" },
+                  { value: "conservative", label: "Conservative", description: "You prefer renewable projects that are already operating and provide steady, predictable income with very low risk." },
                   { value: "moderate", label: "Moderate", description: "Balance between risk and return" },
                   { value: "aggressive", label: "Aggressive", description: "Higher risk for potentially higher returns" },
                 ].map((option) => (
