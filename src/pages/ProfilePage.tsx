@@ -6,12 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { ArrowRight, Home, TrendingUp, Leaf, Shield } from "lucide-react";
+import { ArrowRight, Home, TrendingUp, Leaf, Shield, Info, FileText } from "lucide-react";
 
 export default function ProfilePage() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [profile, setProfile] = useState({
+    podNumber: "",
     consumption: 3500,
     housingType: "apartment",
     budget: 5000,
@@ -58,31 +59,76 @@ export default function ProfilePage() {
       {step === 1 && (
         <Card className="p-8 space-y-6 animate-fade-in">
           <div className="space-y-2">
-            <h2 className="text-2xl font-bold">Annual Energy Consumption</h2>
-            <p className="text-muted-foreground">How much energy do you consume per year?</p>
+            <h2 className="text-2xl font-bold">Energy Profile</h2>
+            <p className="text-muted-foreground">Help us understand your energy needs</p>
           </div>
 
+          {/* POD Number Section */}
           <div className="space-y-4">
-            <Label>Annual Consumption (kWh)</Label>
-            <div className="text-4xl font-bold text-primary">{profile.consumption.toLocaleString()} kWh</div>
-            <Slider
-              value={[profile.consumption]}
-              onValueChange={([value]) => setProfile({ ...profile, consumption: value })}
-              min={1000}
-              max={10000}
-              step={100}
-              className="py-4"
-            />
-            <div className="flex justify-between text-sm text-muted-foreground">
-              <span>1,000 kWh</span>
-              <span>10,000 kWh</span>
+            <div className="space-y-2">
+              <Label htmlFor="podNumber" className="text-base">POD Number (Point of Delivery)</Label>
+              <Input
+                id="podNumber"
+                type="text"
+                placeholder="LU0000000000000000"
+                value={profile.podNumber}
+                onChange={(e) => setProfile({ ...profile, podNumber: e.target.value.toUpperCase() })}
+                maxLength={18}
+                className="font-mono"
+              />
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Info className="w-4 h-4" />
+                <span>Find this 18-character code on your Enovos invoice</span>
+              </div>
+              {profile.podNumber && !profile.podNumber.startsWith("LU") && profile.podNumber.length > 0 && (
+                <p className="text-sm text-amber-600 flex items-center gap-1">
+                  <Info className="w-4 h-4" />
+                  POD numbers typically start with "LU"
+                </p>
+              )}
+            </div>
+
+            {/* Educational Info Card */}
+            <div className="bg-muted/50 rounded-lg p-4 space-y-2 border border-border/50">
+              <div className="flex items-center gap-2 text-sm font-medium">
+                <FileText className="w-4 h-4 text-primary" />
+                <span>What is a POD number?</span>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Your Point of Delivery (POD) is a unique identifier for your electricity meter. 
+                It helps us validate your energy data via Leneda and enables invoice integration 
+                to show your energy savings and CO₂ impact.
+              </p>
             </div>
           </div>
 
-          <div className="pt-4">
-            <p className="text-sm text-muted-foreground">
-              💡 Average household: ~3,500 kWh/year
-            </p>
+          <div className="border-t pt-6 space-y-4">
+            <div className="space-y-2">
+              <Label className="text-base">Annual Energy Consumption</Label>
+              <p className="text-sm text-muted-foreground">How much energy do you consume per year?</p>
+            </div>
+
+            <div className="space-y-4">
+              <div className="text-4xl font-bold text-primary">{profile.consumption.toLocaleString()} kWh</div>
+              <Slider
+                value={[profile.consumption]}
+                onValueChange={([value]) => setProfile({ ...profile, consumption: value })}
+                min={1000}
+                max={10000}
+                step={100}
+                className="py-4"
+              />
+              <div className="flex justify-between text-sm text-muted-foreground">
+                <span>1,000 kWh</span>
+                <span>10,000 kWh</span>
+              </div>
+            </div>
+
+            <div className="pt-2">
+              <p className="text-sm text-muted-foreground">
+                💡 Average household: ~3,500 kWh/year
+              </p>
+            </div>
           </div>
         </Card>
       )}
