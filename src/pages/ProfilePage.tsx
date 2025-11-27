@@ -11,6 +11,7 @@ import { ArrowRight, Home, TrendingUp, Leaf, Shield, Info, FileText } from "luci
 export default function ProfilePage() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
+  const [dataMode, setDataMode] = useState<"pod" | "manual">("pod");
   const [profile, setProfile] = useState({
     podNumber: "",
     consumption: 3500,
@@ -63,73 +64,111 @@ export default function ProfilePage() {
             <p className="text-muted-foreground">Help us understand your energy needs</p>
           </div>
 
-          {/* POD Number Section */}
+          {/* Data Mode Selection */}
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="podNumber" className="text-base">POD Number (Point of Delivery)</Label>
-              <Input
-                id="podNumber"
-                type="text"
-                placeholder="LU0000000000000000"
-                value={profile.podNumber}
-                onChange={(e) => setProfile({ ...profile, podNumber: e.target.value.toUpperCase() })}
-                maxLength={18}
-                className="font-mono"
-              />
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Info className="w-4 h-4" />
-                <span>Find this 18-character code on your Enovos invoice</span>
+            <Label className="text-base">How would you like to proceed?</Label>
+            <RadioGroup value={dataMode} onValueChange={(value: "pod" | "manual") => setDataMode(value)}>
+              <div className="grid md:grid-cols-2 gap-4">
+                <label
+                  className="flex items-start gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all hover:border-primary has-[:checked]:border-primary has-[:checked]:bg-primary/5"
+                >
+                  <RadioGroupItem value="pod" className="mt-1" />
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <FileText className="w-5 h-5 text-primary" />
+                      <span className="font-semibold">Use POD Number</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">Validate with real data via Leneda</p>
+                  </div>
+                </label>
+                <label
+                  className="flex items-start gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all hover:border-primary has-[:checked]:border-primary has-[:checked]:bg-primary/5"
+                >
+                  <RadioGroupItem value="manual" className="mt-1" />
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <TrendingUp className="w-5 h-5 text-accent" />
+                      <span className="font-semibold">Manual Entry</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">Run simulation with estimated data</p>
+                  </div>
+                </label>
               </div>
-              {profile.podNumber && !profile.podNumber.startsWith("LU") && profile.podNumber.length > 0 && (
-                <p className="text-sm text-amber-600 flex items-center gap-1">
+            </RadioGroup>
+          </div>
+
+          {/* POD Number Section - Only shown when POD mode is selected */}
+          {dataMode === "pod" && (
+            <div className="space-y-4 animate-fade-in">
+              <div className="space-y-2">
+                <Label htmlFor="podNumber" className="text-base">POD Number (Point of Delivery)</Label>
+                <Input
+                  id="podNumber"
+                  type="text"
+                  placeholder="LU0000000000000000"
+                  value={profile.podNumber}
+                  onChange={(e) => setProfile({ ...profile, podNumber: e.target.value.toUpperCase() })}
+                  maxLength={18}
+                  className="font-mono"
+                />
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Info className="w-4 h-4" />
-                  POD numbers typically start with "LU"
+                  <span>Find this 18-character code on your Enovos invoice</span>
+                </div>
+                {profile.podNumber && !profile.podNumber.startsWith("LU") && profile.podNumber.length > 0 && (
+                  <p className="text-sm text-amber-600 flex items-center gap-1">
+                    <Info className="w-4 h-4" />
+                    POD numbers typically start with "LU"
+                  </p>
+                )}
+              </div>
+
+              {/* Educational Info Card */}
+              <div className="bg-muted/50 rounded-lg p-4 space-y-2 border border-border/50">
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <FileText className="w-4 h-4 text-primary" />
+                  <span>What is a POD number?</span>
+                </div>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Your Point of Delivery (POD) is a unique identifier for your electricity meter. 
+                  It helps us validate your energy data via Leneda and enables invoice integration 
+                  to show your energy savings and CO₂ impact.
                 </p>
-              )}
-            </div>
-
-            {/* Educational Info Card */}
-            <div className="bg-muted/50 rounded-lg p-4 space-y-2 border border-border/50">
-              <div className="flex items-center gap-2 text-sm font-medium">
-                <FileText className="w-4 h-4 text-primary" />
-                <span>What is a POD number?</span>
-              </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Your Point of Delivery (POD) is a unique identifier for your electricity meter. 
-                It helps us validate your energy data via Leneda and enables invoice integration 
-                to show your energy savings and CO₂ impact.
-              </p>
-            </div>
-          </div>
-
-          <div className="border-t pt-6 space-y-4">
-            <div className="space-y-2">
-              <Label className="text-base">Annual Energy Consumption</Label>
-              <p className="text-sm text-muted-foreground">How much energy do you consume per year?</p>
-            </div>
-
-            <div className="space-y-4">
-              <div className="text-4xl font-bold text-primary">{profile.consumption.toLocaleString()} kWh</div>
-              <Slider
-                value={[profile.consumption]}
-                onValueChange={([value]) => setProfile({ ...profile, consumption: value })}
-                min={1000}
-                max={10000}
-                step={100}
-                className="py-4"
-              />
-              <div className="flex justify-between text-sm text-muted-foreground">
-                <span>1,000 kWh</span>
-                <span>10,000 kWh</span>
               </div>
             </div>
+          )}
 
-            <div className="pt-2">
-              <p className="text-sm text-muted-foreground">
-                💡 Average household: ~3,500 kWh/year
-              </p>
+          {/* Manual Consumption Section - Only shown when Manual mode is selected */}
+          {dataMode === "manual" && (
+            <div className="space-y-4 animate-fade-in">
+              <div className="space-y-2">
+                <Label className="text-base">Annual Energy Consumption</Label>
+                <p className="text-sm text-muted-foreground">How much energy do you consume per year?</p>
+              </div>
+
+              <div className="space-y-4">
+                <div className="text-4xl font-bold text-primary">{profile.consumption.toLocaleString()} kWh</div>
+                <Slider
+                  value={[profile.consumption]}
+                  onValueChange={([value]) => setProfile({ ...profile, consumption: value })}
+                  min={1000}
+                  max={10000}
+                  step={100}
+                  className="py-4"
+                />
+                <div className="flex justify-between text-sm text-muted-foreground">
+                  <span>1,000 kWh</span>
+                  <span>10,000 kWh</span>
+                </div>
+              </div>
+
+              <div className="pt-2">
+                <p className="text-sm text-muted-foreground">
+                  💡 Average household: ~3,500 kWh/year
+                </p>
+              </div>
             </div>
-          </div>
+          )}
         </Card>
       )}
 
