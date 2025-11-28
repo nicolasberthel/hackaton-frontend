@@ -4,11 +4,30 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Sun, Battery, Wind, TrendingUp, Leaf, DollarSign, AlertCircle, Plus } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Sun, Battery, Wind, TrendingUp, Leaf, DollarSign, AlertCircle, Plus, Loader2, Info } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, LineChart, Line } from "recharts";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
+
+interface LoadCurveData {
+  timestamp: string;
+  value: string;
+}
+
+interface LoadCurveResponse {
+  data: LoadCurveData[];
+}
+
+const fetchLoadCurve = async (podNumber: string): Promise<LoadCurveResponse> => {
+  const response = await fetch(`/api/loadcurve/${podNumber}`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch load curve data");
+  }
+  return response.json();
+};
 
 export default function DashboardPage() {
   const location = useLocation();
@@ -18,6 +37,25 @@ export default function DashboardPage() {
     const savedData = localStorage.getItem('portfolioData');
     return savedData ? JSON.parse(savedData) : null;
   });
+
+  // POD selection state
+  const [selectedPod, setSelectedPod] = useState("00001");
+
+  // Fetch load curve data
+  const { data: loadCurveData, isLoading: isLoadingChart, error: chartError } = useQuery({
+    queryKey: ["loadcurve", selectedPod],
+    queryFn: () => fetchLoadCurve(selectedPod),
+  });
+
+  // Transform data for chart
+  const consumptionChartData = loadCurveData?.data.map((item) => ({
+    timestamp: new Date(item.timestamp).toLocaleString("en-US", {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+    }),
+    value: parseFloat(item.value),
+  })) || [];
 
   // Sell dialog state
   const [sellDialogOpen, setSellDialogOpen] = useState(false);
@@ -467,6 +505,84 @@ export default function DashboardPage() {
             <p className="text-xs mt-1">Check back later for AI-powered optimization suggestions</p>
           </div>
         )}
+      </Card>
+
+      {/* Energy Consumption Chart */}
+      <Card className="p-8 space-y-6">
+        <div className="flex items-start justify-between">
+          <div className="space-y-2">
+            <h2 className="text-2xl font-bold">Energy Consumption</h2>
+            <p className="text-muted-foreground">
+              Real-time consumption data from your POD
+            </p>
+          </div>
+          <div className="w-48">
+            <Select value={selectedPod} onValueChange={setSelectedPod}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select POD" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="00001">POD 00001</SelectItem>
+                <SelectItem value="00006">POD 00006</SelectItem>
+                <SelectItem value="00007">POD 00007</SelectItem>
+                <SelectItem value="00009">POD 00009</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div className="h-96">
+          {isLoadingChart && (
+            <div className="flex items-center justify-center h-full">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          )}
+
+          {chartError && (
+            <div className="flex items-center justify-center h-full text-red-500">
+              <div className="text-center">
+                <Info className="w-8 h-8 mx-auto mb-2" />
+                <p>Unable to load consumption data</p>
+              </div>
+            </div>
+          )}
+
+          {loadCurveData && !isLoadingChart && (
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={consumptionChartData}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                <XAxis 
+                  dataKey="timestamp" 
+                  angle={-45}
+                  textAnchor="end"
+                  height={80}
+                  tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
+                />
+                <YAxis 
+                  label={{ value: "kWh", angle: -90, position: "insideLeft", fill: 'hsl(var(--muted-foreground))' }}
+                  tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
+                />
+                <Tooltip 
+                  contentStyle={{
+                    backgroundColor: 'hsl(var(--background))',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '8px'
+                  }}
+                  formatter={(value: number) => [`${value} kWh`, 'Consumption']}
+                />
+                <Legend />
+                <Line 
+                  type="monotone" 
+                  dataKey="value" 
+                  stroke="hsl(var(--primary))" 
+                  name="Consumption (kWh)"
+                  strokeWidth={2}
+                  dot={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          )}
+        </div>
       </Card>
 
       {/* Monthly Financial Benefits Chart */}

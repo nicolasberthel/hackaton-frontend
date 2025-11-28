@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,8 +9,26 @@ import { Slider } from "@/components/ui/slider";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowRight, Home, TrendingUp, Leaf, Shield, Info, FileText, Zap, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Home, TrendingUp, Leaf, Shield, Info, FileText, Zap, CheckCircle2, Loader2 } from "lucide-react";
 import { LoadingScreen } from "@/components/LoadingScreen";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+
+interface LoadCurveData {
+  timestamp: string;
+  value: string;
+}
+
+interface LoadCurveResponse {
+  data: LoadCurveData[];
+}
+
+const fetchLoadCurve = async (podNumber: string): Promise<LoadCurveResponse> => {
+  const response = await fetch(`/api/loadcurve/${podNumber}`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch load curve data");
+  }
+  return response.json();
+};
 
 export default function ProfilePage() {
   const navigate = useNavigate();
@@ -31,6 +50,26 @@ export default function ProfilePage() {
 
   // Check if POD is complete (18 characters)
   const isPodComplete = profile.podNumber.length === 18;
+
+  // Extract last 5 digits from POD for API call
+  const podLast5Digits = isPodComplete ? profile.podNumber.slice(-5) : "";
+
+  // Fetch load curve data when POD is complete
+  const { data: loadCurveData, isLoading: isLoadingChart, error: chartError } = useQuery({
+    queryKey: ["loadcurve", podLast5Digits],
+    queryFn: () => fetchLoadCurve(podLast5Digits),
+    enabled: isPodComplete && dataMode === "pod",
+  });
+
+  // Transform data for chart
+  const chartData = loadCurveData?.data.map((item) => ({
+    timestamp: new Date(item.timestamp).toLocaleString("en-US", {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+    }),
+    value: parseFloat(item.value),
+  })) || [];
 
   // Check if user can continue from step 1
   const canContinueFromStep1 = 
@@ -188,6 +227,7 @@ export default function ProfilePage() {
                   )}
                 </div>
               )}
+
             </div>}
 
           {/* Manual Consumption Section - Only shown when Manual mode is selected */}
@@ -265,6 +305,67 @@ export default function ProfilePage() {
               </div>
             </RadioGroup>
           </div>
+
+          {/* Consumption Chart - Only shown when POD mode was used */}
+          {dataMode === "pod" && profile.podNumber.length === 18 && (
+            <div className="space-y-4 animate-fade-in border-t pt-6">
+              <div className="space-y-2">
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-primary" />
+                  Your Energy Consumption
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  POD: {profile.podNumber} (Last 5 digits: {profile.podNumber.slice(-5)})
+                </p>
+              </div>
+
+              <div className="bg-card rounded-lg border p-4">
+                {isLoadingChart && (
+                  <div className="flex items-center justify-center h-64">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  </div>
+                )}
+
+                {chartError && (
+                  <div className="flex items-center justify-center h-64 text-red-500">
+                    <div className="text-center">
+                      <Info className="w-8 h-8 mx-auto mb-2" />
+                      <p>Unable to load consumption data</p>
+                    </div>
+                  </div>
+                )}
+
+                {loadCurveData && !isLoadingChart && (
+                  <ResponsiveContainer width="100%" height={300}>
+                    <LineChart data={chartData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis 
+                        dataKey="timestamp" 
+                        angle={-45}
+                        textAnchor="end"
+                        height={80}
+                        tick={{ fontSize: 12 }}
+                      />
+                      <YAxis 
+                        label={{ value: "kWh", angle: -90, position: "insideLeft" }}
+                        tick={{ fontSize: 12 }}
+                      />
+                      <Tooltip />
+                      <Legend />
+                      <Line 
+                        type="monotone" 
+                        dataKey="value" 
+                        stroke="#8884d8" 
+                        name="Consumption (kWh)"
+                        strokeWidth={2}
+                        dot={false}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Energy Tariff */}
           <div className="space-y-4 border-t pt-6">
