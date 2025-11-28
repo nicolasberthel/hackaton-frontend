@@ -22,7 +22,7 @@ export default function ProfilePage() {
     consumption: 3500,
     housingType: "apartment",
     energyTariff: "fix-naturstroum",
-    budget: 5000,
+    budget: 1000,
     riskAppetite: "moderate",
     objectives: [] as string[]
   });
@@ -317,9 +317,9 @@ export default function ProfilePage() {
             <Slider value={[profile.budget]} onValueChange={([value]) => setProfile({
           ...profile,
           budget: value
-        })} min={1000} max={50000} step={500} className="py-4" />
+        })} min={250} max={50000} step={250} className="py-4" />
             <div className="flex justify-between text-sm text-muted-foreground">
-              <span>€1,000</span>
+              <span>€250</span>
               <span>€50,000</span>
             </div>
           </div>

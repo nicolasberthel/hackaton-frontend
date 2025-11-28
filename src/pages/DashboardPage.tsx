@@ -109,23 +109,41 @@ export default function DashboardPage() {
     },
   ];
 
-  const aiRecommendations = [
+  const [aiRecommendations, setAiRecommendations] = useState([
     {
+      id: 1,
       type: "increase",
       message: "Consider increasing battery storage by 15% to optimize energy autonomy",
       priority: "medium",
+      cost: 320,
     },
     {
+      id: 2,
       type: "opportunity",
       message: "New solar project available matching your profile - 8.2% expected return",
       priority: "high",
+      cost: 450,
     },
     {
+      id: 3,
       type: "optimize",
       message: "Your wind energy allocation could be increased for better diversification",
       priority: "low",
+      cost: 280,
     },
-  ];
+  ]);
+
+  const handleAcceptRecommendation = (id: number, message: string, cost: number) => {
+    toast.success(`Recommendation accepted! ${message} (€${cost})`, {
+      description: "This optimization will be applied to your portfolio",
+    });
+    setAiRecommendations(aiRecommendations.filter(rec => rec.id !== id));
+  };
+
+  const handleRejectRecommendation = (id: number) => {
+    toast.info("Recommendation dismissed");
+    setAiRecommendations(aiRecommendations.filter(rec => rec.id !== id));
+  };
 
 
   // Asset ownership breakdown - uses actual investment percentages
@@ -384,40 +402,71 @@ export default function DashboardPage() {
 
       {/* AI Recommendations */}
       <Card className="p-6 space-y-4">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-            <span className="text-white text-sm font-bold">AI</span>
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+              <span className="text-white text-sm font-bold">AI</span>
+            </div>
+            <h2 className="text-xl font-bold">Smart Recommendations</h2>
           </div>
-          <h2 className="text-xl font-bold">Smart Recommendations</h2>
+          <p className="text-sm text-muted-foreground pl-10">
+            Our AI continuously analyzes your portfolio performance, new investment opportunities, and your energy consumption patterns to suggest optimal portfolio adjustments.
+          </p>
         </div>
 
-        <div className="space-y-3">
-          {aiRecommendations.map((rec, index) => (
-            <div
-              key={index}
-              className="flex items-start gap-3 p-4 rounded-lg bg-muted/50 hover:bg-muted transition-all"
-            >
-              <AlertCircle
-                className={`w-5 h-5 mt-0.5 ${
-                  rec.priority === "high"
-                    ? "text-primary"
-                    : rec.priority === "medium"
-                    ? "text-accent"
-                    : "text-muted-foreground"
-                }`}
-              />
-              <div className="flex-1">
-                <p className="text-sm">{rec.message}</p>
-              </div>
-              <Badge
-                variant={rec.priority === "high" ? "default" : "outline"}
-                className={rec.priority === "high" ? "bg-primary" : ""}
+        {aiRecommendations.length > 0 ? (
+          <div className="space-y-3">
+            {aiRecommendations.map((rec) => (
+              <div
+                key={rec.id}
+                className="flex items-start gap-3 p-4 rounded-lg bg-muted/50 border border-border"
               >
-                {rec.priority}
-              </Badge>
-            </div>
-          ))}
-        </div>
+                <AlertCircle
+                  className={`w-5 h-5 mt-0.5 shrink-0 ${
+                    rec.priority === "high"
+                      ? "text-primary"
+                      : rec.priority === "medium"
+                      ? "text-accent"
+                      : "text-muted-foreground"
+                  }`}
+                />
+                <div className="flex-1 space-y-3">
+                  <div>
+                    <p className="text-sm mb-1">{rec.message}</p>
+                    <p className="text-xs text-muted-foreground">Estimated cost: €{rec.cost}</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button 
+                      size="sm" 
+                      onClick={() => handleAcceptRecommendation(rec.id, rec.message, rec.cost)}
+                      className="bg-primary hover:bg-primary-dark"
+                    >
+                      Accept
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => handleRejectRecommendation(rec.id)}
+                    >
+                      Reject
+                    </Button>
+                  </div>
+                </div>
+                <Badge
+                  variant={rec.priority === "high" ? "default" : "outline"}
+                  className={rec.priority === "high" ? "bg-primary shrink-0" : "shrink-0"}
+                >
+                  {rec.priority}
+                </Badge>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-8 text-muted-foreground">
+            <p className="text-sm">No new recommendations at this time</p>
+            <p className="text-xs mt-1">Check back later for AI-powered optimization suggestions</p>
+          </div>
+        )}
       </Card>
 
       {/* Monthly Financial Benefits Chart */}
