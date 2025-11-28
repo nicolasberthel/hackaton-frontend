@@ -22,7 +22,7 @@ interface LoadCurveResponse {
 }
 
 const fetchLoadCurve = async (podNumber: string): Promise<LoadCurveResponse> => {
-  const response = await fetch(`http://18.246.38.71:8000/loadcurve/${podNumber}`);
+  const response = await fetch(`https://3zt62irsak.execute-api.us-west-2.amazonaws.com/loadcurve/${podNumber}`);
   if (!response.ok) {
     throw new Error("Failed to fetch load curve data");
   }
