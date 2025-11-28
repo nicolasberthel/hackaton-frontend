@@ -1,6 +1,7 @@
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { Home, User, TrendingUp, ShoppingBag, LayoutDashboard } from "lucide-react";
 import { cn } from "@/lib/utils";
+import fractionLogo from "@/assets/fraction-logo.png";
 
 const navigation = [
   { name: "Home", path: "/", icon: Home },
@@ -19,13 +20,8 @@ export default function Layout() {
       <nav className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                <span className="text-white font-bold text-lg">E</span>
-              </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                EncInvest
-              </span>
+            <div className="flex items-center">
+              <img src={fractionLogo} alt="Fraction" className="h-10" />
             </div>
 
             {/* Desktop Navigation */}
