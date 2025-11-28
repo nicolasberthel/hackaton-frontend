@@ -1,6 +1,8 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Users, Zap, Leaf, MapPin, TrendingUp, Award } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { Users, Zap, Leaf, MapPin, TrendingUp, Award, Target } from "lucide-react";
 import LuxembourgMap from "@/components/LuxembourgMap";
 
 export default function CommunityPage() {
@@ -23,6 +25,33 @@ export default function CommunityPage() {
     { year: 2024, title: "10K Investors", investors: 10000, mw: 180 },
     { year: 2024, title: "200 MW Funded", investors: 12500, mw: 200 },
     { year: 2025, title: "Goal: 500 MW", investors: 30000, mw: 500, upcoming: true },
+  ];
+
+  const crowdfundingProjects = [
+    {
+      id: 1,
+      name: "Ettelbruck Solar Farm Phase 2",
+      type: "Solar PV",
+      target: 450000,
+      raised: 387500,
+      investors: 1847,
+      capacity: "2.8 MW",
+      returns: "6.2% annually",
+      userInvested: 2500,
+      icon: Zap,
+    },
+    {
+      id: 2,
+      name: "Community Battery Storage Hub",
+      type: "Battery Storage",
+      target: 320000,
+      raised: 168000,
+      investors: 892,
+      capacity: "1.5 MWh",
+      returns: "5.8% annually",
+      userInvested: 0,
+      icon: Target,
+    },
   ];
 
   return (
@@ -107,6 +136,76 @@ export default function CommunityPage() {
               </div>
             </Card>
           ))}
+        </div>
+      </Card>
+
+      {/* Crowdfunding Projects */}
+      <Card className="p-8 space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold">Active Crowdfunding</h2>
+          <Badge variant="outline" className="text-sm">2 Projects Live</Badge>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          {crowdfundingProjects.map((project) => {
+            const percentFunded = (project.raised / project.target) * 100;
+            const isUserInvested = project.userInvested > 0;
+
+            return (
+              <Card key={project.id} className="p-6 space-y-4 border-2">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                      <project.icon className="w-6 h-6 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold">{project.name}</h3>
+                      <Badge variant="secondary" className="mt-1">{project.type}</Badge>
+                    </div>
+                  </div>
+                  {isUserInvested && (
+                    <Badge className="bg-success text-white">Invested</Badge>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Funding Progress</span>
+                    <span className="font-bold">{percentFunded.toFixed(1)}%</span>
+                  </div>
+                  <Progress value={percentFunded} className="h-3" />
+                  <div className="flex justify-between text-sm">
+                    <span className="font-semibold">€{(project.raised / 1000).toFixed(0)}k raised</span>
+                    <span className="text-muted-foreground">of €{(project.target / 1000).toFixed(0)}k</span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-3 pt-3 border-t text-sm">
+                  <div>
+                    <div className="text-muted-foreground">Investors</div>
+                    <div className="font-bold">{project.investors.toLocaleString()}</div>
+                  </div>
+                  <div>
+                    <div className="text-muted-foreground">Capacity</div>
+                    <div className="font-bold">{project.capacity}</div>
+                  </div>
+                  <div>
+                    <div className="text-muted-foreground">Returns</div>
+                    <div className="font-bold text-success">{project.returns}</div>
+                  </div>
+                </div>
+
+                {isUserInvested ? (
+                  <div className="pt-3 border-t">
+                    <div className="text-sm text-muted-foreground mb-2">Your Investment</div>
+                    <div className="text-2xl font-bold text-primary">€{project.userInvested.toLocaleString()}</div>
+                  </div>
+                ) : (
+                  <Button className="w-full mt-2">Invest Now</Button>
+                )}
+              </Card>
+            );
+          })}
         </div>
       </Card>
 

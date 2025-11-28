@@ -2,18 +2,13 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { TrendingUp, Shield, Leaf, LayoutDashboard, ArrowRight, Zap, Users, Award, MapPin, Handshake } from "lucide-react";
-
 export default function HomePage() {
-  return (
-    <div className="space-y-16 pb-20">
+  return <div className="space-y-16 pb-20">
       {/* Hero Section */}
       <div className="text-center space-y-8 py-12">
-        <h1 className="text-5xl font-bold leading-tight bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent mb-6">
-          Invest in the Energy of Tomorrow
-        </h1>
-        <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-          Everyone in Luxembourg can shape our energy future. Small investments add up—together, we're building a sustainable energy landscape, one contribution at a time.
-        </p>
+        <h1 className="text-5xl font-bold leading-tight bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent mb-6">Flexible energy production for</h1>
+        <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">Everyone should be able to help shape Luxembourg’s energy future.
+Small investments. Big impact. A sustainable future built together.</p>
       </div>
 
       {/* Two Journey Cards */}
@@ -234,12 +229,11 @@ export default function HomePage() {
             </Button>
           </Link>
           <Link to="/community">
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
+            <Button size="lg" variant="outline" className="border-white bg-secondary-foreground text-primary">
               Explore Community
             </Button>
           </Link>
         </div>
       </Card>
-    </div>
-  );
+    </div>;
 }

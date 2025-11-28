@@ -1,10 +1,14 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Sun, Battery, Wind, TrendingUp, Leaf, DollarSign, AlertCircle, Plus } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function DashboardPage() {
   const location = useLocation();
@@ -14,6 +18,11 @@ export default function DashboardPage() {
     const savedData = localStorage.getItem('portfolioData');
     return savedData ? JSON.parse(savedData) : null;
   });
+
+  // Sell dialog state
+  const [sellDialogOpen, setSellDialogOpen] = useState(false);
+  const [selectedInvestment, setSelectedInvestment] = useState<any>(null);
+  const [sellPercentage, setSellPercentage] = useState<string>("100");
 
   // Update portfolio data when arriving from confirmation
   useEffect(() => {
@@ -153,6 +162,32 @@ export default function DashboardPage() {
     },
   ];
 
+  const handleOpenSellDialog = (investment: any) => {
+    setSelectedInvestment(investment);
+    setSellPercentage("100");
+    setSellDialogOpen(true);
+  };
+
+  const handleSellShares = () => {
+    if (!selectedInvestment) return;
+    
+    const percentage = parseFloat(sellPercentage);
+    if (isNaN(percentage) || percentage <= 0 || percentage > 100) {
+      toast.error("Please enter a valid percentage between 1 and 100");
+      return;
+    }
+
+    const sellAmount = (selectedInvestment.currentValue * percentage) / 100;
+    toast.success(`Successfully sold ${percentage}% of ${selectedInvestment.name} for €${sellAmount.toFixed(2)}`);
+    setSellDialogOpen(false);
+  };
+
+  const getSellAmount = () => {
+    if (!selectedInvestment) return 0;
+    const percentage = parseFloat(sellPercentage) || 0;
+    return (selectedInvestment.currentValue * percentage) / 100;
+  };
+
   return (
     <div className="max-w-6xl mx-auto space-y-8 pb-20">
       {/* Header */}
@@ -248,14 +283,104 @@ export default function DashboardPage() {
                   </div>
                 </div>
 
-                <Button variant="outline" size="sm" className="w-full">
-                  View Details
-                </Button>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" className="flex-1">
+                    View Details
+                  </Button>
+                  <Button 
+                    variant="destructive" 
+                    size="sm" 
+                    className="flex-1"
+                    onClick={() => handleOpenSellDialog(investment)}
+                  >
+                    Sell
+                  </Button>
+                </div>
               </Card>
             );
           })}
         </div>
       </div>
+
+      {/* Sell Dialog */}
+      <Dialog open={sellDialogOpen} onOpenChange={setSellDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Sell Portfolio Shares</DialogTitle>
+            <DialogDescription>
+              How much of your {selectedInvestment?.name} investment would you like to sell?
+            </DialogDescription>
+          </DialogHeader>
+
+          {selectedInvestment && (
+            <div className="space-y-6 py-4">
+              <div className="space-y-4 p-4 rounded-lg bg-muted/50">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Current Value</span>
+                  <span className="font-bold">€{selectedInvestment.currentValue.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Original Investment</span>
+                  <span className="font-medium">€{selectedInvestment.invested.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Current Gain</span>
+                  <span className="font-bold text-success">
+                    +€{(selectedInvestment.currentValue - selectedInvestment.invested).toLocaleString()}
+                  </span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="sell-percentage">Percentage to Sell (%)</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="sell-percentage"
+                    type="number"
+                    min="1"
+                    max="100"
+                    value={sellPercentage}
+                    onChange={(e) => setSellPercentage(e.target.value)}
+                    placeholder="100"
+                  />
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setSellPercentage("100")}
+                  >
+                    Max
+                  </Button>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-lg border-2 border-primary bg-primary/5">
+                <div className="flex justify-between items-center">
+                  <span className="font-medium">You will receive</span>
+                  <span className="text-2xl font-bold text-primary">
+                    €{getSellAmount().toFixed(2)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className="sm:justify-between">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setSellDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button 
+              type="button"
+              variant="destructive"
+              onClick={handleSellShares}
+            >
+              Confirm Sale
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* AI Recommendations */}
       <Card className="p-6 space-y-4">
