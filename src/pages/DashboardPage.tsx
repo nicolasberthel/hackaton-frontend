@@ -5,12 +5,15 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Sun, Battery, Wind, TrendingUp, Leaf, DollarSign, AlertCircle, Plus, Loader2, Info } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { Sun, Battery, Wind, TrendingUp, Leaf, DollarSign, AlertCircle, Plus, Loader2, Info, ChevronLeft, ChevronRight, Calendar as CalendarIcon } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, LineChart, Line } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, LineChart, Line, Area, ComposedChart } from "recharts";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { API_BASE_URL } from "@/config/api";
 
 interface LoadCurveData {
   timestamp: string;
@@ -19,14 +22,189 @@ interface LoadCurveData {
 
 interface LoadCurveResponse {
   data: LoadCurveData[];
+  page?: number;
+  page_size?: number;
+  total?: number;
 }
 
-const fetchLoadCurve = async (podNumber: string): Promise<LoadCurveResponse> => {
-  const response = await fetch(`https://3zt62irsak.execute-api.us-west-2.amazonaws.com/loadcurve/${podNumber}`);
+interface ProductionData {
+  timestamp: string;
+  value: string;
+}
+
+interface ProductionResponse {
+  data: ProductionData[];
+}
+
+// Format date to YYYY-MM-DD for API
+const formatDateForAPI = (date: Date): string => {
+  return date.toISOString().split("T")[0];
+};
+
+// Fetch load curve by single date
+const fetchLoadCurveByDate = async (
+  podNumber: string,
+  date: Date
+): Promise<LoadCurveResponse> => {
+  const url = `${API_BASE_URL}/loadcurve/${podNumber}?date=${formatDateForAPI(date)}`;
+
+  const response = await fetch(url);
   if (!response.ok) {
     throw new Error("Failed to fetch load curve data");
   }
   return response.json();
+};
+
+// Fetch load curve by date range (optimized for week/month)
+const fetchLoadCurveByDateRange = async (
+  podNumber: string,
+  fromDate: Date,
+  toDate: Date,
+  pageSize: number = 1000
+): Promise<LoadCurveResponse> => {
+  const url = `${API_BASE_URL}/loadcurve/${podNumber}?from_date=${formatDateForAPI(fromDate)}&to_date=${formatDateForAPI(toDate)}&page_size=${pageSize}`;
+
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error("Failed to fetch load curve data");
+  }
+  return response.json();
+};
+
+// Fetch monthly aggregated load curve for a year
+const fetchLoadCurveMonthly = async (
+  podNumber: string,
+  year: number
+): Promise<LoadCurveResponse> => {
+  const url = `${API_BASE_URL}/loadcurve/${podNumber}/monthly?year=${year}`;
+
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error("Failed to fetch monthly load curve data");
+  }
+  const result = await response.json();
+  // API returns array directly, wrap it in expected format
+  return Array.isArray(result) ? { data: result } : result;
+};
+
+// Fetch load curve for multiple days
+const fetchLoadCurveMultipleDays = async (
+  podNumber: string,
+  fromDate: Date,
+  toDate: Date
+): Promise<LoadCurveData[]> => {
+  const days: Date[] = [];
+  const currentDate = new Date(fromDate);
+  
+  // Generate array of dates
+  while (currentDate <= toDate) {
+    days.push(new Date(currentDate));
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+
+  console.log(`Fetching ${days.length} days from ${formatDateForAPI(fromDate)} to ${formatDateForAPI(toDate)}`);
+
+  // Fetch all days in parallel
+  const fetchPromises = days.map((day) => fetchLoadCurveByDate(podNumber, day));
+  const results = await Promise.all(fetchPromises);
+
+  // Combine all data
+  const allData = results.flatMap((result) => result.data);
+  console.log(`Fetched total of ${allData.length} data points`);
+  
+  return allData;
+};
+
+// Fetch production data by single date
+const fetchProductionByDate = async (
+  projectId: string,
+  date: Date
+): Promise<ProductionResponse> => {
+  const url = `${API_BASE_URL}/projects/${projectId}/production?date=${formatDateForAPI(date)}`;
+
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch production data for project ${projectId}`);
+  }
+  return response.json();
+};
+
+// Fetch production by date range (optimized for week/month)
+const fetchProductionByDateRange = async (
+  projectId: string,
+  fromDate: Date,
+  toDate: Date,
+  pageSize: number = 1000
+): Promise<ProductionResponse> => {
+  const url = `${API_BASE_URL}/projects/${projectId}/production?from_date=${formatDateForAPI(fromDate)}&to_date=${formatDateForAPI(toDate)}&page_size=${pageSize}`;
+
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch production data for project ${projectId}`);
+  }
+  return response.json();
+};
+
+// Fetch monthly aggregated production for a year
+const fetchProductionMonthly = async (
+  projectId: string,
+  year: number
+): Promise<ProductionResponse> => {
+  const url = `${API_BASE_URL}/projects/${projectId}/production/monthly?year=${year}`;
+
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch monthly production data for project ${projectId}`);
+  }
+  const result = await response.json();
+  // API returns array directly, wrap it in expected format
+  return Array.isArray(result) ? { data: result } : result;
+};
+
+// Fetch production for multiple days
+const fetchProductionMultipleDays = async (
+  projectId: string,
+  fromDate: Date,
+  toDate: Date
+): Promise<ProductionData[]> => {
+  const days: Date[] = [];
+  const currentDate = new Date(fromDate);
+  
+  // Generate array of dates
+  while (currentDate <= toDate) {
+    days.push(new Date(currentDate));
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+
+  // Fetch all days in parallel
+  const fetchPromises = days.map((day) => fetchProductionByDate(projectId, day));
+  const results = await Promise.all(fetchPromises);
+
+  // Combine all data
+  return results.flatMap((result) => result.data);
+};
+
+// Aggregate data by day for monthly view (generic function)
+const aggregateByDay = <T extends { timestamp: string; value: string }>(data: T[]): T[] => {
+  const dailyData = new Map<string, { sum: number; count: number }>();
+
+  data.forEach((item) => {
+    const date = new Date(item.timestamp);
+    const dayKey = date.toISOString().split("T")[0]; // YYYY-MM-DD
+
+    if (!dailyData.has(dayKey)) {
+      dailyData.set(dayKey, { sum: 0, count: 0 });
+    }
+
+    const entry = dailyData.get(dayKey)!;
+    entry.sum += parseFloat(item.value);
+    entry.count += 1;
+  });
+
+  return Array.from(dailyData.entries()).map(([dayKey, { sum, count }]) => ({
+    timestamp: dayKey + "T12:00:00Z", // Use noon as representative time
+    value: (sum / count).toFixed(2), // Average value for the day
+  })) as T[];
 };
 
 export default function DashboardPage() {
@@ -40,22 +218,337 @@ export default function DashboardPage() {
 
   // POD selection state
   const [selectedPod, setSelectedPod] = useState("00001");
+  
+  // Time period state
+  type TimePeriod = "day" | "week" | "month" | "year";
+  const [timePeriod, setTimePeriod] = useState<TimePeriod>("day");
+  
+  // Date selection - default to June 17, 2023
+  const [selectedDate, setSelectedDate] = useState(new Date(2023, 5, 17)); // Month is 0-indexed
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
-  // Fetch load curve data
-  const { data: loadCurveData, isLoading: isLoadingChart, error: chartError } = useQuery({
-    queryKey: ["loadcurve", selectedPod],
-    queryFn: () => fetchLoadCurve(selectedPod),
+  // Calculate date range based on selected date and time period
+  const getDateRange = (date: Date, period: TimePeriod): { fromDate: Date; toDate: Date } => {
+    const fromDate = new Date(date);
+    const toDate = new Date(date);
+
+    switch (period) {
+      case "day":
+        // Single day
+        fromDate.setHours(0, 0, 0, 0);
+        toDate.setHours(23, 59, 59, 999);
+        break;
+      case "week":
+        // Start from Monday of the week
+        const dayOfWeek = fromDate.getDay();
+        const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // Adjust to Monday
+        fromDate.setDate(fromDate.getDate() + diff);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate.setDate(fromDate.getDate() + 6);
+        toDate.setHours(23, 59, 59, 999);
+        break;
+      case "month":
+        // Entire month
+        fromDate.setDate(1);
+        fromDate.setHours(0, 0, 0, 0);
+        toDate.setMonth(toDate.getMonth() + 1, 0); // Last day of month
+        toDate.setHours(23, 59, 59, 999);
+        break;
+      case "year":
+        // Entire year
+        fromDate.setMonth(0, 1); // January 1st
+        fromDate.setHours(0, 0, 0, 0);
+        toDate.setMonth(11, 31); // December 31st
+        toDate.setHours(23, 59, 59, 999);
+        break;
+    }
+
+    return { fromDate, toDate };
+  };
+
+  // Get week number from date
+  const getWeekNumber = (date: Date): number => {
+    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    return Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+  };
+
+  // Get actual date range from loaded data
+  const getActualDateLabel = (data: LoadCurveData[] | undefined, period: TimePeriod): string => {
+    if (!data || data.length === 0) {
+      return "No data";
+    }
+
+    const firstDate = new Date(data[0].timestamp);
+    const lastDate = new Date(data[data.length - 1].timestamp);
+
+    switch (period) {
+      case "day":
+        return firstDate.toLocaleDateString("en-US", {
+          weekday: "short",
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        });
+      case "week":
+        const weekNum = getWeekNumber(firstDate);
+        return `Week ${weekNum}, ${firstDate.getFullYear()}`;
+      case "month":
+        return firstDate.toLocaleDateString("en-US", {
+          month: "long",
+          year: "numeric",
+        });
+      case "year":
+        return firstDate.getFullYear().toString();
+      default:
+        return firstDate.toLocaleDateString();
+    }
+  };
+
+  // Navigate to previous/next period
+  const navigatePeriod = (direction: "prev" | "next") => {
+    const newDate = new Date(selectedDate);
+    const multiplier = direction === "prev" ? -1 : 1;
+
+    switch (timePeriod) {
+      case "day":
+        newDate.setDate(newDate.getDate() + multiplier);
+        break;
+      case "week":
+        newDate.setDate(newDate.getDate() + 7 * multiplier);
+        break;
+      case "month":
+        newDate.setMonth(newDate.getMonth() + multiplier);
+        break;
+      case "year":
+        newDate.setFullYear(newDate.getFullYear() + multiplier);
+        break;
+    }
+
+    setSelectedDate(newDate);
+  };
+
+  // Fetch load curve data using optimized queries
+  const { data: rawLoadCurveData, isLoading: isLoadingChart, error: chartError } = useQuery({
+    queryKey: ["loadcurve", selectedPod, selectedDate, timePeriod],
+    queryFn: async () => {
+      if (timePeriod === "year") {
+        // Year: Use monthly aggregated endpoint
+        return fetchLoadCurveMonthly(selectedPod, selectedDate.getFullYear());
+      }
+      
+      const { fromDate, toDate } = getDateRange(selectedDate, timePeriod);
+      
+      if (timePeriod === "day") {
+        return fetchLoadCurveByDate(selectedPod, selectedDate);
+      } else if (timePeriod === "week") {
+        // Week: 7 days * 96 = 672 points (within 1000 limit)
+        return fetchLoadCurveByDateRange(selectedPod, fromDate, toDate, 1000);
+      } else {
+        // Month: Split into 2 queries (first half: 1-15, second half: 16-end)
+        // Each half: ~10 days * 96 = ~960 points (within 1000 limit)
+        const midDate = new Date(fromDate);
+        midDate.setDate(15);
+        const midDateEnd = new Date(midDate);
+        midDateEnd.setDate(midDate.getDate() + 1);
+        
+        const [firstHalf, secondHalf] = await Promise.all([
+          fetchLoadCurveByDateRange(selectedPod, fromDate, midDate, 1000),
+          fetchLoadCurveByDateRange(selectedPod, midDateEnd, toDate, 1000),
+        ]);
+        
+        return { data: [...firstHalf.data, ...secondHalf.data] };
+      }
+    },
   });
 
-  // Transform data for chart
-  const consumptionChartData = loadCurveData?.data.map((item) => ({
-    timestamp: new Date(item.timestamp).toLocaleString("en-US", {
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-    }),
-    value: parseFloat(item.value),
-  })) || [];
+  // Fetch wind turbine production (project 00002)
+  const { data: rawWindData } = useQuery({
+    queryKey: ["production", "00002", selectedDate, timePeriod],
+    queryFn: async () => {
+      if (timePeriod === "year") {
+        return fetchProductionMonthly("00002", selectedDate.getFullYear());
+      }
+      
+      const { fromDate, toDate } = getDateRange(selectedDate, timePeriod);
+      
+      if (timePeriod === "day") {
+        return fetchProductionByDate("00002", selectedDate);
+      } else if (timePeriod === "week") {
+        return fetchProductionByDateRange("00002", fromDate, toDate, 1000);
+      } else {
+        const midDate = new Date(fromDate);
+        midDate.setDate(15);
+        const midDateEnd = new Date(midDate);
+        midDateEnd.setDate(midDate.getDate() + 1);
+        
+        const [firstHalf, secondHalf] = await Promise.all([
+          fetchProductionByDateRange("00002", fromDate, midDate, 1000),
+          fetchProductionByDateRange("00002", midDateEnd, toDate, 1000),
+        ]);
+        
+        return { data: [...firstHalf.data, ...secondHalf.data] };
+      }
+    },
+  });
+
+  // Fetch PV production (project 00003)
+  const { data: rawPvData } = useQuery({
+    queryKey: ["production", "00003", selectedDate, timePeriod],
+    queryFn: async () => {
+      if (timePeriod === "year") {
+        return fetchProductionMonthly("00003", selectedDate.getFullYear());
+      }
+      
+      const { fromDate, toDate } = getDateRange(selectedDate, timePeriod);
+      
+      if (timePeriod === "day") {
+        return fetchProductionByDate("00003", selectedDate);
+      } else if (timePeriod === "week") {
+        return fetchProductionByDateRange("00003", fromDate, toDate, 1000);
+      } else {
+        const midDate = new Date(fromDate);
+        midDate.setDate(15);
+        const midDateEnd = new Date(midDate);
+        midDateEnd.setDate(midDate.getDate() + 1);
+        
+        const [firstHalf, secondHalf] = await Promise.all([
+          fetchProductionByDateRange("00003", fromDate, midDate, 1000),
+          fetchProductionByDateRange("00003", midDateEnd, toDate, 1000),
+        ]);
+        
+        return { data: [...firstHalf.data, ...secondHalf.data] };
+      }
+    },
+  });
+
+  // Process data: aggregate for monthly view, year is already aggregated
+  const loadCurveData = rawLoadCurveData
+    ? {
+        ...rawLoadCurveData,
+        data:
+          timePeriod === "month"
+            ? aggregateByDay(rawLoadCurveData.data)
+            : rawLoadCurveData.data,
+      }
+    : undefined;
+
+  const windProductionData = rawWindData
+    ? {
+        ...rawWindData,
+        data:
+          timePeriod === "month"
+            ? aggregateByDay(rawWindData.data)
+            : rawWindData.data,
+      }
+    : undefined;
+
+  const pvProductionData = rawPvData
+    ? {
+        ...rawPvData,
+        data:
+          timePeriod === "month"
+            ? aggregateByDay(rawPvData.data)
+            : rawPvData.data,
+      }
+    : undefined;
+
+
+
+
+
+  // Merge consumption and production data by timestamp
+  const consumptionChartData = (() => {
+    if (!loadCurveData?.data) return [];
+
+    // Normalize timestamp to ISO string for consistent comparison
+    const normalizeTimestamp = (ts: string) => {
+      const date = new Date(ts);
+      // For year view, normalize to first day of month at midnight UTC
+      if (timePeriod === "year") {
+        return new Date(Date.UTC(date.getFullYear(), date.getMonth(), 1, 0, 0, 0, 0)).toISOString();
+      }
+      return date.toISOString();
+    };
+
+    // Create maps for quick lookup with normalized timestamps
+    const windMap = new Map(
+      windProductionData?.data.map((item) => [
+        normalizeTimestamp(item.timestamp), 
+        parseFloat(item.value)
+      ]) || []
+    );
+    const pvMap = new Map(
+      pvProductionData?.data.map((item) => [
+        normalizeTimestamp(item.timestamp), 
+        parseFloat(item.value)
+      ]) || []
+    );
+
+
+
+    const chartData = loadCurveData.data.map((item, index) => {
+      const date = new Date(item.timestamp);
+      let formattedTimestamp: string;
+
+      switch (timePeriod) {
+        case "day":
+          // Show only hours for daily view (e.g., "14:00")
+          formattedTimestamp = date.toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          });
+          break;
+        case "week":
+          // Show day name and date for weekly view (e.g., "Mon 17" or "Tue 18")
+          // Only show every 16th point to avoid crowding
+          if (index % 16 === 0) {
+            formattedTimestamp = date.toLocaleDateString("en-US", {
+              weekday: "short",
+              day: "numeric",
+            });
+          } else {
+            formattedTimestamp = ""; // Empty for intermediate points
+          }
+          break;
+        case "month":
+          // Show only date for monthly view (e.g., "17")
+          formattedTimestamp = date.toLocaleDateString("en-US", {
+            day: "numeric",
+          });
+          break;
+        case "year":
+          // Show month name for yearly view (e.g., "Jan", "Feb")
+          formattedTimestamp = date.toLocaleDateString("en-US", {
+            month: "short",
+          });
+          break;
+        default:
+          formattedTimestamp = date.toLocaleString("en-US", {
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+          });
+      }
+
+      const normalizedTimestamp = normalizeTimestamp(item.timestamp);
+      const wind = windMap.get(normalizedTimestamp) || 0;
+      const pv = pvMap.get(normalizedTimestamp) || 0;
+
+      return {
+        timestamp: formattedTimestamp,
+        Consumption: parseFloat(item.value),
+        Wind: Number(wind),
+        PV: Number(pv),
+        fullDate: date, // Keep full date for tooltip
+      };
+    });
+
+    return chartData;
+  })();
 
   // Sell dialog state
   const [sellDialogOpen, setSellDialogOpen] = useState(false);
@@ -531,6 +1024,108 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {/* Time Period and Pagination Controls */}
+        <div className="space-y-4">
+          {/* Date Picker and Period Selector */}
+          <div className="flex items-center justify-between gap-4 p-4 bg-muted/30 rounded-lg">
+            <div className="flex items-center gap-3">
+              <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="justify-start text-left font-normal">
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {selectedDate.toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <CalendarComponent
+                    mode="single"
+                    selected={selectedDate}
+                    defaultMonth={selectedDate}
+                    onSelect={(date) => {
+                      if (date) {
+                        setSelectedDate(date);
+                        setIsCalendarOpen(false);
+                      }
+                    }}
+                    captionLayout="dropdown-buttons"
+                    fromYear={2020}
+                    toYear={2030}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+
+              <div className="h-6 w-px bg-border" />
+
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">View:</span>
+                <div className="flex gap-1">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setTimePeriod("day")}
+                    className={timePeriod === "day" ? "bg-primary text-white" : ""}
+                  >
+                    Day
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setTimePeriod("week")}
+                    className={timePeriod === "week" ? "bg-primary text-white" : ""}
+                  >
+                    Week
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setTimePeriod("month")}
+                    className={timePeriod === "month" ? "bg-primary text-white" : ""}
+                  >
+                    Month
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setTimePeriod("year")}
+                    className={timePeriod === "year" ? "bg-primary text-white" : ""}
+                  >
+                    Year
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigatePeriod("prev")}
+                disabled={isLoadingChart}
+              >
+                <ChevronLeft className="w-4 h-4" />
+                Previous
+              </Button>
+              <span className="text-sm font-medium px-3 min-w-[180px] text-center">
+                {getActualDateLabel(loadCurveData?.data, timePeriod)}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigatePeriod("next")}
+                disabled={isLoadingChart}
+              >
+                Next
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+
         <div className="h-96">
           {isLoadingChart && (
             <div className="flex items-center justify-center h-full">
@@ -549,37 +1144,148 @@ export default function DashboardPage() {
 
           {loadCurveData && !isLoadingChart && (
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={consumptionChartData}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                <XAxis 
-                  dataKey="timestamp" 
-                  angle={-45}
-                  textAnchor="end"
-                  height={80}
-                  tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
-                />
-                <YAxis 
-                  label={{ value: "kWh", angle: -90, position: "insideLeft", fill: 'hsl(var(--muted-foreground))' }}
-                  tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
-                />
-                <Tooltip 
-                  contentStyle={{
-                    backgroundColor: 'hsl(var(--background))',
-                    border: '1px solid hsl(var(--border))',
-                    borderRadius: '8px'
-                  }}
-                  formatter={(value: number) => [`${value} kWh`, 'Consumption']}
-                />
-                <Legend />
-                <Line 
-                  type="monotone" 
-                  dataKey="value" 
-                  stroke="hsl(var(--primary))" 
-                  name="Consumption (kWh)"
-                  strokeWidth={2}
-                  dot={false}
-                />
-              </LineChart>
+              {timePeriod === "month" || timePeriod === "year" ? (
+                <BarChart 
+                  data={consumptionChartData.map(item => {
+                    const totalProduction = item.Wind + item.PV;
+                    const productionUsed = Math.min(totalProduction, item.Consumption);
+                    const gridImport = Math.max(0, item.Consumption - totalProduction);
+                    const excessProduction = Math.max(0, totalProduction - item.Consumption);
+                    
+                    // Calculate how much of each source is used vs excess
+                    const windUsed = Math.min(item.Wind, item.Consumption);
+                    const pvUsed = Math.min(item.PV, Math.max(0, item.Consumption - windUsed));
+                    
+                    return {
+                      ...item,
+                      WindUsed: windUsed,
+                      PVUsed: pvUsed,
+                      GridImport: gridImport,
+                      Excess: excessProduction,
+                    };
+                  })}
+                >
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                  <XAxis 
+                    dataKey="timestamp" 
+                    tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
+                  />
+                  <YAxis 
+                    label={{ value: "kWh (avg)", angle: -90, position: "insideLeft", fill: 'hsl(var(--muted-foreground))' }}
+                    tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
+                  />
+                  <Tooltip 
+                    contentStyle={{
+                      backgroundColor: 'hsl(var(--background))',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '8px'
+                    }}
+                    content={({ active, payload }) => {
+                      if (active && payload && payload.length) {
+                        const data = payload[0].payload;
+                        const totalProd = data.Wind + data.PV;
+                        const coverage = (totalProd / data.Consumption) * 100;
+                        
+                        return (
+                          <div className="bg-background border border-border rounded-lg p-3 shadow-lg">
+                            <p className="font-semibold mb-2">{data.timestamp}</p>
+                            <p className="text-sm font-semibold">Consumption: {data.Consumption.toFixed(2)} kWh</p>
+                            <p className="text-sm text-blue-500">Wind: {data.Wind.toFixed(2)} kWh</p>
+                            <p className="text-sm text-orange-500">PV: {data.PV.toFixed(2)} kWh</p>
+                            {data.GridImport > 0 && (
+                              <p className="text-sm text-gray-500">Grid Import: {data.GridImport.toFixed(2)} kWh</p>
+                            )}
+                            {data.Excess > 0 && (
+                              <p className="text-sm text-green-500">Excess Export: {data.Excess.toFixed(2)} kWh</p>
+                            )}
+                            <p className="text-sm font-semibold mt-1">Self-Coverage: {Math.min(100, coverage).toFixed(1)}%</p>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
+                  <Legend />
+                  {/* Single stacked bar: production (bottom) → grid import (middle) → excess (top) */}
+                  <Bar 
+                    dataKey="WindUsed" 
+                    fill="#3b82f6" 
+                    name="Wind"
+                    stackId="bar"
+                  />
+                  <Bar 
+                    dataKey="PVUsed" 
+                    fill="#f97316" 
+                    name="PV"
+                    stackId="bar"
+                  />
+                  <Bar 
+                    dataKey="GridImport" 
+                    fill="#94a3b8" 
+                    name="Grid Import"
+                    stackId="bar"
+                  />
+                  <Bar 
+                    dataKey="Excess" 
+                    fill="#22c55e" 
+                    name="Excess Export"
+                    stackId="bar"
+                    radius={[4, 4, 0, 0]}
+                  />
+                </BarChart>
+              ) : (
+                <ComposedChart data={consumptionChartData}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                  <XAxis 
+                    dataKey="timestamp" 
+                    angle={timePeriod === "day" ? 0 : -45}
+                    textAnchor={timePeriod === "day" ? "middle" : "end"}
+                    height={timePeriod === "day" ? 50 : 80}
+                    tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
+                    interval={timePeriod === "day" ? "preserveStartEnd" : 0}
+                  />
+                  <YAxis 
+                    label={{ value: "kWh", angle: -90, position: "insideLeft", fill: 'hsl(var(--muted-foreground))' }}
+                    tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
+                  />
+                  <Tooltip 
+                    contentStyle={{
+                      backgroundColor: 'hsl(var(--background))',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '8px'
+                    }}
+                  />
+                  <Legend />
+                  {/* Production areas (stacked) */}
+                  <Area 
+                    type="monotone" 
+                    dataKey="Wind" 
+                    fill="#3b82f6" 
+                    stroke="#3b82f6"
+                    fillOpacity={0.6}
+                    name="Wind"
+                    stackId="1"
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="PV" 
+                    fill="#f97316" 
+                    stroke="#f97316"
+                    fillOpacity={0.6}
+                    name="PV"
+                    stackId="1"
+                  />
+                  {/* Consumption line on top */}
+                  <Line 
+                    type="monotone" 
+                    dataKey="Consumption" 
+                    stroke="hsl(var(--primary))" 
+                    name="Consumption"
+                    strokeWidth={2}
+                    dot={false}
+                  />
+                </ComposedChart>
+              )}
             </ResponsiveContainer>
           )}
         </div>

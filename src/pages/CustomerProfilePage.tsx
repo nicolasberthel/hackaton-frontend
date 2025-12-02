@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { Loader2 } from "lucide-react";
+import { API_BASE_URL } from "@/config/api";
 
 interface LoadCurveData {
   timestamp: string;
@@ -16,7 +17,7 @@ interface LoadCurveResponse {
 }
 
 const fetchLoadCurve = async (podNumber: string): Promise<LoadCurveResponse> => {
-  const response = await fetch(`https://3zt62irsak.execute-api.us-west-2.amazonaws.com/loadcurve/${podNumber}`);
+  const response = await fetch(`${API_BASE_URL}/loadcurve/${podNumber}`);
   if (!response.ok) {
     throw new Error("Failed to fetch load curve data");
   }
