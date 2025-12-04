@@ -364,38 +364,8 @@ export default function DashboardPage() {
     },
   });
 
-  // Fetch wind turbine production (project 00002)
+  // Fetch wind turbine production (project 00003)
   const { data: rawWindData } = useQuery({
-    queryKey: ["production", "00002", selectedDate, timePeriod],
-    queryFn: async () => {
-      if (timePeriod === "year") {
-        return fetchProductionMonthly("00002", selectedDate.getFullYear());
-      }
-      
-      const { fromDate, toDate } = getDateRange(selectedDate, timePeriod);
-      
-      if (timePeriod === "day") {
-        return fetchProductionByDate("00002", selectedDate);
-      } else if (timePeriod === "week") {
-        return fetchProductionByDateRange("00002", fromDate, toDate, 1000);
-      } else {
-        const midDate = new Date(fromDate);
-        midDate.setDate(15);
-        const midDateEnd = new Date(midDate);
-        midDateEnd.setDate(midDate.getDate() + 1);
-        
-        const [firstHalf, secondHalf] = await Promise.all([
-          fetchProductionByDateRange("00002", fromDate, midDate, 1000),
-          fetchProductionByDateRange("00002", midDateEnd, toDate, 1000),
-        ]);
-        
-        return { data: [...firstHalf.data, ...secondHalf.data] };
-      }
-    },
-  });
-
-  // Fetch PV production (project 00003)
-  const { data: rawPvData } = useQuery({
     queryKey: ["production", "00003", selectedDate, timePeriod],
     queryFn: async () => {
       if (timePeriod === "year") {
@@ -417,6 +387,36 @@ export default function DashboardPage() {
         const [firstHalf, secondHalf] = await Promise.all([
           fetchProductionByDateRange("00003", fromDate, midDate, 1000),
           fetchProductionByDateRange("00003", midDateEnd, toDate, 1000),
+        ]);
+        
+        return { data: [...firstHalf.data, ...secondHalf.data] };
+      }
+    },
+  });
+
+  // Fetch PV production (project 00002)
+  const { data: rawPvData } = useQuery({
+    queryKey: ["production", "00002", selectedDate, timePeriod],
+    queryFn: async () => {
+      if (timePeriod === "year") {
+        return fetchProductionMonthly("00002", selectedDate.getFullYear());
+      }
+      
+      const { fromDate, toDate } = getDateRange(selectedDate, timePeriod);
+      
+      if (timePeriod === "day") {
+        return fetchProductionByDate("00002", selectedDate);
+      } else if (timePeriod === "week") {
+        return fetchProductionByDateRange("00002", fromDate, toDate, 1000);
+      } else {
+        const midDate = new Date(fromDate);
+        midDate.setDate(15);
+        const midDateEnd = new Date(midDate);
+        midDateEnd.setDate(midDate.getDate() + 1);
+        
+        const [firstHalf, secondHalf] = await Promise.all([
+          fetchProductionByDateRange("00002", fromDate, midDate, 1000),
+          fetchProductionByDateRange("00002", midDateEnd, toDate, 1000),
         ]);
         
         return { data: [...firstHalf.data, ...secondHalf.data] };
