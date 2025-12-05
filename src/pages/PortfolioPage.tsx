@@ -156,7 +156,7 @@ export default function PortfolioPage() {
   // Energy chart state
   type TimePeriod = "day" | "week" | "month" | "year";
   const [timePeriod, setTimePeriod] = useState<TimePeriod>("day");
-  const [selectedDate, setSelectedDate] = useState(new Date(2023, 5, 17));
+  const [selectedDate, setSelectedDate] = useState(new Date(2025, 10, 12));
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [aiRecommendations, setAiRecommendations] = useState([
     {

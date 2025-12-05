@@ -217,14 +217,14 @@ export default function DashboardPage() {
   });
 
   // POD selection state
-  const [selectedPod, setSelectedPod] = useState("00001");
+  const [selectedPod, setSelectedPod] = useState("00016");
   
   // Time period state
   type TimePeriod = "day" | "week" | "month" | "year";
   const [timePeriod, setTimePeriod] = useState<TimePeriod>("day");
   
-  // Date selection - default to June 17, 2023
-  const [selectedDate, setSelectedDate] = useState(new Date(2023, 5, 17)); // Month is 0-indexed
+  // Date selection - default to June 17, 2024
+  const [selectedDate, setSelectedDate] = useState(new Date(2025, 11, 12)); // Month is 0-indexed
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   // Calculate date range based on selected date and time period
@@ -366,18 +366,18 @@ export default function DashboardPage() {
 
   // Fetch wind turbine production (project 00003)
   const { data: rawWindData } = useQuery({
-    queryKey: ["production", "00003", selectedDate, timePeriod],
+    queryKey: ["production", "00015", selectedDate, timePeriod],
     queryFn: async () => {
       if (timePeriod === "year") {
-        return fetchProductionMonthly("00003", selectedDate.getFullYear());
+        return fetchProductionMonthly("00015", selectedDate.getFullYear());
       }
       
       const { fromDate, toDate } = getDateRange(selectedDate, timePeriod);
       
       if (timePeriod === "day") {
-        return fetchProductionByDate("00003", selectedDate);
+        return fetchProductionByDate("00015", selectedDate);
       } else if (timePeriod === "week") {
-        return fetchProductionByDateRange("00003", fromDate, toDate, 1000);
+        return fetchProductionByDateRange("00015", fromDate, toDate, 1000);
       } else {
         const midDate = new Date(fromDate);
         midDate.setDate(15);
@@ -385,8 +385,8 @@ export default function DashboardPage() {
         midDateEnd.setDate(midDate.getDate() + 1);
         
         const [firstHalf, secondHalf] = await Promise.all([
-          fetchProductionByDateRange("00003", fromDate, midDate, 1000),
-          fetchProductionByDateRange("00003", midDateEnd, toDate, 1000),
+          fetchProductionByDateRange("00015", fromDate, midDate, 1000),
+          fetchProductionByDateRange("00015", midDateEnd, toDate, 1000),
         ]);
         
         return { data: [...firstHalf.data, ...secondHalf.data] };
@@ -396,18 +396,18 @@ export default function DashboardPage() {
 
   // Fetch PV production (project 00002)
   const { data: rawPvData } = useQuery({
-    queryKey: ["production", "00002", selectedDate, timePeriod],
+    queryKey: ["production", "00012", selectedDate, timePeriod],
     queryFn: async () => {
       if (timePeriod === "year") {
-        return fetchProductionMonthly("00002", selectedDate.getFullYear());
+        return fetchProductionMonthly("00012", selectedDate.getFullYear());
       }
       
       const { fromDate, toDate } = getDateRange(selectedDate, timePeriod);
       
       if (timePeriod === "day") {
-        return fetchProductionByDate("00002", selectedDate);
+        return fetchProductionByDate("00012", selectedDate);
       } else if (timePeriod === "week") {
-        return fetchProductionByDateRange("00002", fromDate, toDate, 1000);
+        return fetchProductionByDateRange("00012", fromDate, toDate, 1000);
       } else {
         const midDate = new Date(fromDate);
         midDate.setDate(15);
@@ -415,8 +415,8 @@ export default function DashboardPage() {
         midDateEnd.setDate(midDate.getDate() + 1);
         
         const [firstHalf, secondHalf] = await Promise.all([
-          fetchProductionByDateRange("00002", fromDate, midDate, 1000),
-          fetchProductionByDateRange("00002", midDateEnd, toDate, 1000),
+          fetchProductionByDateRange("00012", fromDate, midDate, 1000),
+          fetchProductionByDateRange("00012", midDateEnd, toDate, 1000),
         ]);
         
         return { data: [...firstHalf.data, ...secondHalf.data] };
@@ -1010,17 +1010,7 @@ export default function DashboardPage() {
             </p>
           </div>
           <div className="w-48">
-            <Select value={selectedPod} onValueChange={setSelectedPod}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select POD" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="00001">POD 00001</SelectItem>
-                <SelectItem value="00006">POD 00006</SelectItem>
-                <SelectItem value="00007">POD 00007</SelectItem>
-                <SelectItem value="00009">POD 00009</SelectItem>
-              </SelectContent>
-            </Select>
+           
           </div>
         </div>
 
