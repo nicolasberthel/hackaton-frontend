@@ -58,7 +58,7 @@ export default function CommunityPage() {
     <div className="max-w-6xl mx-auto space-y-8 pb-20">
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold">EncInvest Investment Community</h1>
+        <h1 className="text-3xl font-bold">Fraction Investment Community</h1>
         <p className="text-muted-foreground">
           Join thousands of investors building a decentralized renewable energy future
         </p>
