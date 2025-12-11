@@ -38,6 +38,34 @@ const familyProfileData: LoadProfileDataPoint[] = [
   { hour: "23", solar: 0.0, wind: 0.5, battery: 0.0, consumption: 0.7 },
 ];
 
+// New family profile with curve pattern matching the provided image
+const familyProfileData2: LoadProfileDataPoint[] = [
+  { hour: "0",  solar: 0.0, wind: 2.5, battery: 0.0, consumption: 0.8 },
+  { hour: "1",  solar: 0.0, wind: 2.5, battery: 0.0, consumption: 0.7 },
+  { hour: "2",  solar: 0.0, wind: 2.5, battery: 0.0, consumption: 0.6 },
+  { hour: "3",  solar: 0.0, wind: 2.5, battery: 0.0, consumption: 0.5 },
+  { hour: "4",  solar: 0.0, wind: 2.5, battery: 1.0, consumption: 0.5 },
+  { hour: "5",  solar: 0.0, wind: 2.5, battery: 0.0, consumption: 0.6 },
+  { hour: "6",  solar: 0.3, wind: 2.5, battery: 0.0, consumption: 1.2 },
+  { hour: "7",  solar: 0.9, wind: 2.1, battery: 0.0, consumption: 9.0 },
+  { hour: "8",  solar: 1.2, wind: 2.1, battery: 0.0, consumption: 2.8 },
+  { hour: "9",  solar: 2.7, wind: 2.1, battery: 0.0, consumption: 4.2 },
+  { hour: "10", solar: 3.6, wind: 2.1, battery: 0.0, consumption: 5.8 },
+  { hour: "11", solar: 4.2, wind: 2.1, battery: 0.0, consumption: 10.5 },
+  { hour: "12", solar: 4.5, wind: 2.1, battery: 0.0, consumption: 9.5 },
+  { hour: "13", solar: 3.6, wind: 2.1, battery: 0.0, consumption: 10 },
+  { hour: "14", solar: 3.6, wind: 2.1, battery: 0.0, consumption: 9.2 },
+  { hour: "15", solar: 3.0, wind: 2.5, battery: 0.0, consumption: 7.8 },
+  { hour: "16", solar: 2.1, wind: 2.5, battery: 0.0, consumption: 6.2 },
+  { hour: "17", solar: 1.2, wind: 2.9, battery: 0.0, consumption: 7.8 },
+  { hour: "18", solar: 0.6, wind: 2.9, battery: 0.0, consumption: 9.6 },
+  { hour: "19", solar: 0.0, wind: 2.9, battery: 0.0, consumption: 4.8 },
+  { hour: "20", solar: 0.0, wind: 2.9, battery: 0.0, consumption: 2.2 },
+  { hour: "21", solar: 0.0, wind: 2.9, battery: 0.0, consumption: 1.5 },
+  { hour: "22", solar: 0.0, wind: 2.9, battery: 0.0, consumption: 1.0 },
+  { hour: "23", solar: 0.0, wind: 2.5, battery: 0.0, consumption: 0.8 },
+];
+
 // POD ending with 2: Single mom profile
 const singleMomProfileData: LoadProfileDataPoint[] = [
   { hour: "0",  solar: 0.0, wind: 0.4, battery: 0.0, consumption: 0.3 },
@@ -126,7 +154,8 @@ const singleManProfileData: LoadProfileDataPoint[] = [
  * Load profiles mapped by type
  */
 export const loadProfiles = {
-  family: familyProfileData,
+  family: familyProfileData2, // Using the new curve pattern as default
+  familyOriginal: familyProfileData, // Keep original for reference
   singleMom: singleMomProfileData,
   garage: garageProfileData,
   singleMan: singleManProfileData,
@@ -137,14 +166,14 @@ export const loadProfiles = {
  */
 export function getLoadProfileByPod(podNumber: string): LoadProfileDataPoint[] {
   if (!podNumber || podNumber.length === 0) {
-    return familyProfileData; // Default fallback
+    return familyProfileData2; // Default fallback to new curve pattern
   }
 
   const lastDigit = podNumber.charAt(podNumber.length - 1);
   
   switch (lastDigit) {
     case '1':
-      return familyProfileData;
+      return familyProfileData2; // Using new curve pattern for family profile
     case '2':
       return singleMomProfileData;
     case '3':
@@ -155,7 +184,7 @@ export function getLoadProfileByPod(podNumber: string): LoadProfileDataPoint[] {
       // For digits 5-9 and 0, cycle through profiles
       const digitNum = parseInt(lastDigit) || 0;
       const profileIndex = digitNum % 4;
-      return [familyProfileData, singleMomProfileData, garageProfileData, singleManProfileData][profileIndex];
+      return [familyProfileData2, singleMomProfileData, garageProfileData, singleManProfileData][profileIndex];
   }
 }
 

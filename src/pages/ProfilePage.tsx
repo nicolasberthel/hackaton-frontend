@@ -9,8 +9,9 @@ import { Slider } from "@/components/ui/slider";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowRight, Home, TrendingUp, Leaf, Shield, Info, FileText, Zap, CheckCircle2, Loader2 } from "lucide-react";
+import { ArrowRight, Home, TrendingUp, Leaf, Shield, Info, FileText, Zap, CheckCircle2, Loader2, Sparkles } from "lucide-react";
 import { LoadingScreen } from "@/components/LoadingScreen";
+import { LoadingScreenLeneda } from "@/components/LoadingScreenLeneda";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { API_BASE_URL } from "@/config/api";
 
@@ -24,7 +25,10 @@ interface LoadCurveResponse {
 }
 
 const fetchLoadCurve = async (podNumber: string): Promise<LoadCurveResponse> => {
-  const response = await fetch(`${API_BASE_URL}/loadcurve/${podNumber}`);
+  // Fetch data for November 1-7, 2025
+  const fromDate = '2024-09-20';
+  const toDate = '2024-09-27';
+  const response = await fetch(`${API_BASE_URL}/loadcurve/${podNumber}?from_date=${fromDate}&to_date=${toDate}`);
   if (!response.ok) {
     throw new Error("Failed to fetch load curve data");
   }
@@ -35,6 +39,7 @@ export default function ProfilePage() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingLeneda, setIsLoadingLeneda] = useState(false);
   const [dataMode, setDataMode] = useState<"pod" | "manual">("pod");
   const [lenedaMandate, setLenedaMandate] = useState(false);
   const [profile, setProfile] = useState({
@@ -64,7 +69,7 @@ export default function ProfilePage() {
 
   // Transform data for chart
   const chartData = loadCurveData?.data.map((item) => ({
-    timestamp: new Date(item.timestamp).toLocaleString("en-US", {
+    timestamp: new Date(item.timestamp).toLocaleString("fr-FR", {
       month: "short",
       day: "numeric",
       hour: "2-digit",
@@ -77,13 +82,21 @@ export default function ProfilePage() {
     dataMode === "manual" || (dataMode === "pod" && isPodComplete && lenedaMandate);
 
   const handleContinue = () => {
-    if (step < totalSteps) {
-      setStep(step + 1);
-    } else {
+    if (step == 1) {
+       // Show loading screen before navigating to recommendations
+      setIsLoadingLeneda(true);
+    } else if (step == totalSteps) {
       // Show loading screen before navigating to recommendations
       setIsLoading(true);
-    }
+    } else if (step < totalSteps) {
+      setStep(step + 1);
+    } 
   };
+
+ const handleLenedaLoadingComplete = () => {
+    setIsLoadingLeneda(false);
+    setStep(2);
+ }
 
   const handleLoadingComplete = () => {
     navigate("/recommendations", {
@@ -94,8 +107,11 @@ export default function ProfilePage() {
   };
 
   // Show loading screen overlay
+  if (isLoadingLeneda) {
+    return <LoadingScreenLeneda onComplete={handleLenedaLoadingComplete} />;
+  }
   if (isLoading) {
-    return <LoadingScreen onComplete={handleLoadingComplete} useLeneda={dataMode === "pod"} />;
+    return <LoadingScreen onComplete={handleLoadingComplete} />;
   }
   const toggleObjective = (objective: string) => {
     setProfile(prev => ({
@@ -316,7 +332,7 @@ export default function ProfilePage() {
                   Your Energy Consumption
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  POD: {profile.podNumber} (Last 5 digits: {profile.podNumber.slice(-5)})
+                  POD: {profile.podNumber}
                 </p>
               </div>
 
@@ -416,15 +432,83 @@ export default function ProfilePage() {
           <div className="space-y-4">
             <Label>Investment Budget (€)</Label>
             <div className="text-4xl font-bold text-primary">€{profile.budget.toLocaleString()}</div>
-            <Slider value={[profile.budget]} onValueChange={([value]) => setProfile({
-          ...profile,
-          budget: value
-        })} min={250} max={50000} step={250} className="py-4" />
+            
+            {/* Optimal Investment Tooltip */}
+            <div className="relative h-12 flex items-end">
+              <div 
+                className="absolute bottom-0 pointer-events-none transition-all duration-200"
+                style={{ left: `${((5500 - 250) / (50000 - 250)) * 100}%`, transform: 'translateX(-50%)' }}
+              >
+                <div className="bg-cyan-400 text-white text-xs px-3 py-1.5 rounded-md shadow-lg whitespace-nowrap flex items-center gap-1.5 font-medium">
+                  <Sparkles className="w-3 h-3" />
+                  €5,500 optimal
+                </div>
+                <div className="w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-cyan-400 mx-auto" />
+              </div>
+            </div>
+
+            {/* Custom Styled Slider */}
+            <div className="relative pt-2">
+              <style>{`
+                .budget-slider [role="slider"] {
+                  width: 24px;
+                  height: 24px;
+                  border: 4px solid white;
+                  background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+                  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.4);
+                }
+                .budget-slider [role="slider"]:focus-visible {
+                  outline: none;
+                  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
+                }
+                .budget-slider .slider-track {
+                  height: 8px;
+                  background: linear-gradient(90deg, #8b5cf6 0%, #06b6d4 50%, #14b8a6 100%);
+                  border-radius: 9999px;
+                }
+                .budget-slider .slider-range {
+                  background: transparent;
+                }
+              `}</style>
+              <Slider 
+                value={[profile.budget]} 
+                onValueChange={([value]) => setProfile({ ...profile, budget: value })} 
+                min={250} 
+                max={50000} 
+                step={250} 
+                className="budget-slider"
+              />
+            </div>
+            
             <div className="flex justify-between text-sm text-muted-foreground">
               <span>€250</span>
               <span>€50,000</span>
             </div>
           </div>
+
+          {/* AI-Recommended Investment Box */}
+          <Card className="p-5 bg-cyan-50 dark:bg-cyan-950/20 border-cyan-200 dark:border-cyan-800">
+            <div className="space-y-4">
+              <div className="flex items-start gap-3">
+                <Sparkles className="w-5 h-5 text-cyan-500 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <h3 className="font-semibold text-base mb-2">AI-Recommended Investment</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Based on your <span className="font-medium text-foreground">Leneda data</span> (7,373 kWh/year), 
+                    €5,500 optimizes your self-consumption rate at ~65% — the sweet spot between investment and energy autonomy.
+                  </p>
+                </div>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full border-cyan-500 text-cyan-700 dark:text-cyan-400 hover:bg-cyan-100 dark:hover:bg-cyan-950/40"
+                onClick={() => setProfile({ ...profile, budget: 5500 })}
+              >
+                Apply Recommended Amount (€5,500)
+              </Button>
+            </div>
+          </Card>
         </Card>}
 
       {/* Step 4: Objectives & Risk */}

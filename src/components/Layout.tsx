@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 
 const navigation = [
   { name: "Home", path: "/", icon: Home },
-  { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
+  { name: "Portfolio", path: "/portfolio", icon: LayoutDashboard },
   { name: "Opportunities", path: "/opportunities_dyn", icon: ShoppingBag },
   { name: "Community", path: "/community", icon: User },
 ];

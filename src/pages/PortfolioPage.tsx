@@ -156,7 +156,7 @@ export default function PortfolioPage() {
   // Energy chart state
   type TimePeriod = "day" | "week" | "month" | "year";
   const [timePeriod, setTimePeriod] = useState<TimePeriod>("day");
-  const [selectedDate, setSelectedDate] = useState(new Date(2025, 10, 12));
+  const [selectedDate, setSelectedDate] = useState(new Date(2024, 8, 20));
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [aiRecommendations, setAiRecommendations] = useState([
     {
@@ -1049,10 +1049,10 @@ export default function PortfolioPage() {
                   type="monotone"
                   dataKey="Wind"
                   stackId="production"
-                  fill="#3b82f6"
+                  fill="hsla(217, 90%, 72%, 1.00)" 
                   fillOpacity={0.3}
-                  stroke="#3b82f6"
-                  strokeWidth={2}
+                  stroke="hsla(217, 90%, 72%, 1.00)"
+                  strokeWidth={1}
                   name="Wind Production"
                 />
                 {/* Solar Production Area */}
@@ -1063,15 +1063,16 @@ export default function PortfolioPage() {
                   fill="#f97316"
                   fillOpacity={0.3}
                   stroke="#f97316"
-                  strokeWidth={2}
+                  strokeWidth={1}
                   name="Solar Production"
                 />
                 {/* Consumption Line */}
                 <Line 
                   type="monotone" 
                   dataKey="Consumption" 
-                  stroke="#ef4444" 
+                  stroke="#8d2c2cff" 
                   strokeWidth={2}
+                  strokeDasharray="6 2"
                   dot={false}
                   name="Consumption"
                 />

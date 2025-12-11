@@ -311,7 +311,7 @@ export default function ConfirmationPage() {
           </Button>
         </Link>
         <Link 
-          to="/dashboard" 
+          to="/portfolio" 
           state={{ 
             portfolio: { 
               totalInvestment, 

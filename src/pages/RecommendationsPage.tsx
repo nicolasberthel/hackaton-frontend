@@ -219,8 +219,8 @@ export default function RecommendationsPage() {
                 type="monotone" 
                 dataKey="wind" 
                 stackId="2"
-                stroke="hsl(270, 70%, 60%)" 
-                fill="hsl(270, 70%, 60%)"
+                stroke="hsla(217, 90%, 72%, 1.00)" 
+                fill="hsla(217, 90%, 72%, 1.00)" 
                 fillOpacity={0.8}
                 name="Wind"
               />
@@ -228,8 +228,8 @@ export default function RecommendationsPage() {
                 type="monotone" 
                 dataKey="solar" 
                 stackId="2"
-                stroke="hsl(var(--accent))" 
-                fill="hsl(var(--accent))"
+                stroke="hsl(25, 95%, 53%)" 
+                fill="hsl(25, 95%, 53%)"
                 fillOpacity={0.8}
                 name="Solar"
               />
@@ -237,8 +237,8 @@ export default function RecommendationsPage() {
                 type="monotone" 
                 dataKey="battery" 
                 stackId="2"
-                stroke="hsl(var(--muted-foreground))" 
-                fill="hsl(var(--muted-foreground))"
+                stroke="hsla(268, 9%, 62%, 1.00)" 
+                fill="hsla(268, 9%, 62%, 1.00)" 
                 fillOpacity={0.7}
                 name="Battery"
               />

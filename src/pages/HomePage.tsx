@@ -79,9 +79,9 @@ A sustainable future built together. Small investments. Big impact.</p>
               <span>Get continuous AI recommendations</span>
             </li>
           </ul>
-          <Link to="/dashboard" className="block">
+          <Link to="/portfolio" className="block">
             <Button size="lg" className="w-full bg-gradient-secondary group-hover:shadow-lg">
-              View Dashboard
+              View Portfolio
               <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
           </Link>

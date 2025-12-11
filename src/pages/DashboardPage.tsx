@@ -217,14 +217,14 @@ export default function DashboardPage() {
   });
 
   // POD selection state
-  const [selectedPod, setSelectedPod] = useState("00016");
+  const [selectedPod, setSelectedPod] = useState("00011");
   
   // Time period state
   type TimePeriod = "day" | "week" | "month" | "year";
   const [timePeriod, setTimePeriod] = useState<TimePeriod>("day");
   
   // Date selection - default to June 17, 2024
-  const [selectedDate, setSelectedDate] = useState(new Date(2025, 11, 12)); // Month is 0-indexed
+  const [selectedDate, setSelectedDate] = useState(new Date(2024, 8, 20)); // Month is 0-indexed
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   // Calculate date range based on selected date and time period

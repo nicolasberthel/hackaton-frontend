@@ -2,34 +2,31 @@ import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Sparkles, Database, Calculator, CheckCircle } from "lucide-react";
 
-interface LoadingScreenProps {
+interface LoadingScreenLenedaProps {
   onComplete: () => void;
-  useLeneda?: boolean;
 }
 
-export function LoadingScreen({ onComplete, useLeneda = false }: LoadingScreenProps) {
+export function LoadingScreenLeneda({ onComplete }: LoadingScreenLenedaProps) {
   const [currentStep, setCurrentStep] = useState(0);
 
-
   // Different steps based on whether Leneda is used
-  const steps =  [
+  const steps = [
+    {
+      icon: Database,
+      text: "Fetching Leneda data",
+      duration: 1000,
+    },
     {
       icon: Calculator,
-      text: "Preparing simulation",
-      duration: 1500,
+      text: "Computing consumption",
+      duration: 1000,
     },
-    {
-      icon: Sparkles,
-      text: "Computing optimal investment",
-      duration: 1500,
-    },
-    
     {
       icon: CheckCircle,
       text: "Finalizing recommendations",
       duration: 1000,
     },
-  ];
+  ]
 
   useEffect(() => {
     if (currentStep < steps.length - 1) {
@@ -93,7 +90,7 @@ export function LoadingScreen({ onComplete, useLeneda = false }: LoadingScreenPr
 
         {/* Status Text */}
         <p className="text-center text-sm text-muted-foreground animate-fade-in">
-          Please wait while we personalize your portfolio...
+          Please wait while we are fetching your data...
         </p>
       </Card>
     </div>
